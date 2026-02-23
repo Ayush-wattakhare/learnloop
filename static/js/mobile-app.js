@@ -1,347 +1,140 @@
 /* ══════════════════════════════════════════════════════════════════════
-   Mobile App-Like Interactions for LearnLoop
+   Mobile App-Like Interactions for LearnLoop - OPTIMIZED
    ══════════════════════════════════════════════════════════════════════ */
 
-// ── Initialize Mobile App Features ──
-document.addEventListener('DOMContentLoaded', function() {
-  if (window.innerWidth <= 768) {
-    initBottomNavigation();
-    initPullToRefresh();
-    initHapticFeedback();
-    initSwipeGestures();
-    initPageTransitions();
-    hideAddressBar();
-  }
-});
-
-// ── Bottom Navigation Bar ──
-function initBottomNavigation() {
-  // Check if user is logged in
-  const isLoggedIn = document.querySelector('.navbar-links a[href="/dashboard"]');
-  if (!isLoggedIn) return;
-  
-  // Create bottom navigation
-  const bottomNav = document.createElement('div');
-  bottomNav.className = 'mobile-bottom-nav';
-  bottomNav.innerHTML = `
-    <a href="/dashboard" class="mobile-bottom-nav-item ${window.location.pathname === '/dashboard' ? 'active' : ''}">
-      <span class="icon">🏠</span>
-      <span>Home</span>
-    </a>
-    <a href="/groups" class="mobile-bottom-nav-item ${window.location.pathname === '/groups' ? 'active' : ''}">
-      <span class="icon">👥</span>
-      <span>Groups</span>
-    </a>
-    <a href="/messages" class="mobile-bottom-nav-item ${window.location.pathname === '/messages' ? 'active' : ''}">
-      <span class="icon">💬</span>
-      <span>Messages</span>
-    </a>
-    <a href="/voice-rooms" class="mobile-bottom-nav-item ${window.location.pathname.includes('/voice-room') ? 'active' : ''}">
-      <span class="icon">🎙️</span>
-      <span>Rooms</span>
-    </a>
-    <a href="/profile" class="mobile-bottom-nav-item ${window.location.pathname === '/profile' ? 'active' : ''}">
-      <span class="icon">👤</span>
-      <span>Profile</span>
-    </a>
-  `;
-  
-  document.body.appendChild(bottomNav);
-  
-  // Add active state on click
-  bottomNav.querySelectorAll('.mobile-bottom-nav-item').forEach(item => {
-    item.addEventListener('click', function() {
-      bottomNav.querySelectorAll('.mobile-bottom-nav-item').forEach(i => i.classList.remove('active'));
-      this.classList.add('active');
-    });
-  });
-}
-
-// ── Pull to Refresh ──
-function initPullToRefresh() {
-  let startY = 0;
-  let currentY = 0;
-  let pulling = false;
-  
-  const indicator = document.createElement('div');
-  indicator.className = 'pull-to-refresh';
-  indicator.innerHTML = '↓ Pull to refresh';
-  document.body.appendChild(indicator);
-  
-  document.addEventListener('touchstart', function(e) {
-    if (window.scrollY === 0) {
-      startY = e.touches[0].pageY;
-      pulling = true;
-    }
-  }, { passive: true });
-  
-  document.addEventListener('touchmove', function(e) {
-    if (!pulling) return;
-    
-    currentY = e.touches[0].pageY;
-    const diff = currentY - startY;
-    
-    if (diff > 0 && diff < 100) {
-      indicator.style.transform = `translateX(-50%) translateY(${diff - 100}px)`;
-      indicator.innerHTML = '↓ Pull to refresh';
-    } else if (diff >= 100) {
-      indicator.classList.add('visible');
-      indicator.innerHTML = '↻ Release to refresh';
-    }
-  }, { passive: true });
-  
-  document.addEventListener('touchend', function() {
-    if (!pulling) return;
-    
-    const diff = currentY - startY;
-    if (diff >= 100) {
-      indicator.innerHTML = '⟳ Refreshing...';
-      setTimeout(() => {
-        window.location.reload();
-      }, 500);
+// ── Initialize Mobile App Features (Optimized) ──
+if (window.innerWidth <= 768) {
+    // Use requestIdleCallback for non-critical features
+    if ('requestIdleCallback' in window) {
+        requestIdleCallback(() => {
+            initBottomNavigation();
+            initHapticFeedback();
+        });
     } else {
-      indicator.classList.remove('visible');
-      indicator.style.transform = 'translateX(-50%) translateY(-100px)';
-    }
-    
-    pulling = false;
-    startY = 0;
-    currentY = 0;
-  });
-}
-
-// ── Haptic Feedback ──
-function initHapticFeedback() {
-  // Vibration API for haptic feedback
-  const haptic = (duration = 10) => {
-    if ('vibrate' in navigator) {
-      navigator.vibrate(duration);
-    }
-  };
-  
-  // Add haptic feedback to buttons
-  document.querySelectorAll('.btn, .nav-link, .group-card, .mobile-bottom-nav-item').forEach(element => {
-    element.addEventListener('touchstart', () => haptic(10), { passive: true });
-  });
-  
-  // Add haptic feedback to form submissions
-  document.querySelectorAll('form').forEach(form => {
-    form.addEventListener('submit', () => haptic(20));
-  });
-}
-
-// ── Swipe Gestures ──
-function initSwipeGestures() {
-  let touchStartX = 0;
-  let touchEndX = 0;
-  
-  document.addEventListener('touchstart', e => {
-    touchStartX = e.changedTouches[0].screenX;
-  }, { passive: true });
-  
-  document.addEventListener('touchend', e => {
-    touchEndX = e.changedTouches[0].screenX;
-    handleSwipe();
-  }, { passive: true });
-  
-  function handleSwipe() {
-    const swipeThreshold = 100;
-    const diff = touchEndX - touchStartX;
-    
-    if (Math.abs(diff) > swipeThreshold) {
-      if (diff > 0) {
-        // Swipe right - go back
-        if (window.history.length > 1) {
-          window.history.back();
-        }
-      }
-      // Swipe left could be used for forward navigation
-    }
-  }
-}
-
-// ── Page Transitions ──
-function initPageTransitions() {
-  // Add transition class to main content
-  const pageContainer = document.querySelector('.page-container');
-  if (pageContainer) {
-    pageContainer.classList.add('page-transition');
-  }
-  
-  // Smooth transitions between pages
-  document.querySelectorAll('a:not([target="_blank"])').forEach(link => {
-    link.addEventListener('click', function(e) {
-      const href = this.getAttribute('href');
-      if (href && href.startsWith('/') && !href.includes('#')) {
-        e.preventDefault();
-        
-        // Fade out
-        if (pageContainer) {
-          pageContainer.style.opacity = '0';
-          pageContainer.style.transform = 'translateY(10px)';
-        }
-        
-        // Navigate after animation
         setTimeout(() => {
-          window.location.href = href;
-        }, 200);
-      }
-    });
-  });
+            initBottomNavigation();
+            initHapticFeedback();
+        }, 100);
+    }
+    
+    // Critical features load immediately
+    hideAddressBar();
+    initPageTransitions();
+}
+
+// ── Bottom Navigation Bar (Fixed) ──
+function initBottomNavigation() {
+    const isLoggedIn = document.querySelector('.navbar-links a[href="/dashboard"]');
+    if (!isLoggedIn) return;
+    
+    // Check if already exists
+    if (document.querySelector('.mobile-bottom-nav')) return;
+    
+    const currentPath = window.location.pathname;
+    const bottomNav = document.createElement('div');
+    bottomNav.className = 'mobile-bottom-nav';
+    bottomNav.innerHTML = `
+        <a href="/dashboard" class="mobile-bottom-nav-item ${currentPath === '/dashboard' ? 'active' : ''}">
+            <span class="icon">🏠</span>
+            <span>Home</span>
+        </a>
+        <a href="/groups" class="mobile-bottom-nav-item ${currentPath === '/groups' || currentPath.includes('/group/') ? 'active' : ''}">
+            <span class="icon">👥</span>
+            <span>Groups</span>
+        </a>
+        <a href="/messages" class="mobile-bottom-nav-item ${currentPath === '/messages' || currentPath.includes('/chat/') ? 'active' : ''}">
+            <span class="icon">💬</span>
+            <span>Chat</span>
+        </a>
+        <a href="/voice-rooms" class="mobile-bottom-nav-item ${currentPath.includes('/voice-room') ? 'active' : ''}">
+            <span class="icon">🎙️</span>
+            <span>Rooms</span>
+        </a>
+        <a href="/profile" class="mobile-bottom-nav-item ${currentPath === '/profile' ? 'active' : ''}">
+            <span class="icon">👤</span>
+            <span>Me</span>
+        </a>
+    `;
+    
+    document.body.appendChild(bottomNav);
+}
+
+// ── Haptic Feedback (Lightweight) ──
+function initHapticFeedback() {
+    if (!('vibrate' in navigator)) return;
+    
+    const haptic = () => navigator.vibrate(10);
+    
+    // Use event delegation for better performance
+    document.body.addEventListener('touchstart', (e) => {
+        if (e.target.closest('.btn, .nav-link, .mobile-bottom-nav-item')) {
+            haptic();
+        }
+    }, { passive: true });
+}
+
+// ── Fast Page Transitions ──
+function initPageTransitions() {
+    // Prefetch on hover (desktop) or touchstart (mobile)
+    const prefetchLink = (href) => {
+        if (!href || href.startsWith('#') || href.startsWith('javascript:')) return;
+        
+        const link = document.createElement('link');
+        link.rel = 'prefetch';
+        link.href = href;
+        document.head.appendChild(link);
+    };
+    
+    // Prefetch on mobile touchstart
+    document.body.addEventListener('touchstart', (e) => {
+        const link = e.target.closest('a[href^="/"]');
+        if (link) {
+            prefetchLink(link.getAttribute('href'));
+        }
+    }, { passive: true });
 }
 
 // ── Hide Address Bar ──
 function hideAddressBar() {
-  // Scroll to hide address bar on mobile browsers
-  window.addEventListener('load', () => {
-    setTimeout(() => {
-      window.scrollTo(0, 1);
-    }, 0);
-  });
+    window.addEventListener('load', () => {
+        setTimeout(() => window.scrollTo(0, 1), 0);
+    }, { once: true });
 }
 
-// ── Toast Notifications ──
-function showToast(message, type = 'info') {
-  const toast = document.createElement('div');
-  toast.className = `toast ${type}`;
-  toast.innerHTML = `
-    <span class="icon">${type === 'success' ? '✓' : type === 'error' ? '✕' : 'ℹ'}</span>
-    <span>${message}</span>
-  `;
-  
-  document.body.appendChild(toast);
-  
-  // Haptic feedback
-  if ('vibrate' in navigator) {
-    navigator.vibrate(type === 'error' ? [50, 50, 50] : 20);
-  }
-  
-  // Remove after 3 seconds
-  setTimeout(() => {
-    toast.style.animation = 'slideOutDown 0.3s ease';
-    setTimeout(() => toast.remove(), 300);
-  }, 3000);
-}
-
-// ── Loading Skeleton ──
-function showLoadingSkeleton(container) {
-  const skeleton = `
-    <div class="skeleton-card">
-      <div style="display: flex; gap: 12px; margin-bottom: 12px;">
-        <div class="skeleton-circle"></div>
-        <div style="flex: 1;">
-          <div class="skeleton-line"></div>
-          <div class="skeleton-line short"></div>
-        </div>
-      </div>
-      <div class="skeleton-line"></div>
-      <div class="skeleton-line"></div>
-    </div>
-  `;
-  
-  if (container) {
-    container.innerHTML = skeleton.repeat(3);
-  }
-}
-
-// ── Floating Action Button ──
-function addFAB(icon, onClick) {
-  const fab = document.createElement('button');
-  fab.className = 'fab';
-  fab.innerHTML = icon;
-  fab.addEventListener('click', onClick);
-  document.body.appendChild(fab);
-  return fab;
-}
-
-// ── Optimize Images for Mobile ──
-function optimizeImages() {
-  const images = document.querySelectorAll('img');
-  images.forEach(img => {
-    // Add loading="lazy" if not present
-    if (!img.hasAttribute('loading')) {
-      img.setAttribute('loading', 'lazy');
-    }
-    
-    // Add error handler
-    img.addEventListener('error', function() {
-      this.src = '/static/icons/icon-192x192.png'; // Fallback image
+// ── Optimize Images (Lazy Loading) ──
+if ('loading' in HTMLImageElement.prototype) {
+    // Browser supports native lazy loading
+    document.querySelectorAll('img').forEach(img => {
+        if (!img.loading) img.loading = 'lazy';
     });
-  });
 }
 
-// ── Network Status Indicator ──
-function initNetworkStatus() {
-  window.addEventListener('online', () => {
-    showToast('Back online!', 'success');
-  });
-  
-  window.addEventListener('offline', () => {
-    showToast('No internet connection', 'error');
-  });
-}
-
-// ── Prevent Zoom on Double Tap ──
-let lastTouchEnd = 0;
-document.addEventListener('touchend', function(event) {
-  const now = Date.now();
-  if (now - lastTouchEnd <= 300) {
-    event.preventDefault();
-  }
-  lastTouchEnd = now;
-}, { passive: false });
-
-// ── Smooth Scroll to Top ──
-function scrollToTop() {
-  window.scrollTo({
-    top: 0,
-    behavior: 'smooth'
-  });
-}
-
-// Add scroll to top button
-window.addEventListener('scroll', function() {
-  if (window.innerWidth <= 768) {
-    const scrollBtn = document.getElementById('scrollTopBtn');
-    if (window.scrollY > 300) {
-      if (!scrollBtn) {
-        const btn = document.createElement('button');
-        btn.id = 'scrollTopBtn';
-        btn.className = 'fab';
-        btn.style.bottom = 'calc(150px + env(safe-area-inset-bottom))';
-        btn.innerHTML = '↑';
-        btn.addEventListener('click', scrollToTop);
-        document.body.appendChild(btn);
-      }
-    } else if (scrollBtn) {
-      scrollBtn.remove();
+// ── Network Status (Lightweight) ──
+if ('connection' in navigator) {
+    const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    if (connection && connection.effectiveType === 'slow-2g') {
+        document.body.classList.add('slow-connection');
     }
-  }
-});
-
-// ── Initialize All Features ──
-if (window.innerWidth <= 768) {
-  optimizeImages();
-  initNetworkStatus();
 }
+
+// ── Prevent Zoom on Double Tap (Optimized) ──
+let lastTouchEnd = 0;
+document.addEventListener('touchend', (e) => {
+    const now = Date.now();
+    if (now - lastTouchEnd <= 300) {
+        e.preventDefault();
+    }
+    lastTouchEnd = now;
+}, { passive: false });
 
 // ── Export Functions ──
 window.MobileApp = {
-  showToast,
-  showLoadingSkeleton,
-  addFAB,
-  scrollToTop
+    showToast: (message, type = 'info') => {
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        toast.textContent = message;
+        toast.style.cssText = 'position:fixed;bottom:calc(90px + env(safe-area-inset-bottom));left:16px;right:16px;background:white;padding:16px;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,0.15);z-index:10000;animation:slideUp 0.3s ease';
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
 };
-
-// ── Handle Flash Messages as Toasts ──
-document.addEventListener('DOMContentLoaded', function() {
-  if (window.innerWidth <= 768) {
-    const alerts = document.querySelectorAll('.alert');
-    alerts.forEach(alert => {
-      const type = alert.classList.contains('alert-success') ? 'success' :
-                   alert.classList.contains('alert-danger') || alert.classList.contains('alert-error') ? 'error' : 'info';
-      showToast(alert.textContent.trim(), type);
-      alert.style.display = 'none';
-    });
-  }
-});
