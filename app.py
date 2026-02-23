@@ -51,11 +51,11 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 # ─── Production/Development Config ────────────────────────────────
 # Use environment variables in production, local config in development
 if os.environ.get('PRODUCTION'):
-    # Production configuration (PythonAnywhere, Heroku, etc.)
-    app.config['MYSQL_HOST'] = os.environ.get('MYSQL_HOST', 'localhost')
-    app.config['MYSQL_USER'] = os.environ.get('MYSQL_USER', 'root')
+    # Production configuration (shared hosting, Render, etc.)
+    app.config['MYSQL_HOST'] = os.environ.get('MYSQL_HOST', 'sql12.freesqldatabase.com')
+    app.config['MYSQL_USER'] = os.environ.get('MYSQL_USER', 'sql12817859')
     app.config['MYSQL_PASSWORD'] = os.environ.get('MYSQL_PASSWORD', '')
-    app.config['MYSQL_DB'] = os.environ.get('MYSQL_DB', 'learnloop')
+    app.config['MYSQL_DB'] = os.environ.get('MYSQL_DB', 'sql12817859')
     app.secret_key = os.environ.get('SECRET_KEY', 'learnloop_secret_2024')
     app.config['DEBUG'] = False
 else:
@@ -73,15 +73,23 @@ socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
 # Initialize MySQL (will be None if not configured)
 try:
     if MySQL:
+        print("🔄 Attempting to initialize MySQL connection...")
+        print(f"   Host: {app.config.get('MYSQL_HOST')}")
+        print(f"   User: {app.config.get('MYSQL_USER')}")
+        print(f"   DB: {app.config.get('MYSQL_DB')}")
         mysql = MySQL(app)
         DB_AVAILABLE = True
+        print("✅ MySQL connection initialized successfully")
     else:
         mysql = None
         DB_AVAILABLE = False
+        print("⚠️  Flask-MySQLdb not installed")
 except Exception as e:
     mysql = None
     DB_AVAILABLE = False
-    print("⚠️  MySQL not configured - Running in DEMO MODE ONLY")
+    print("❌ MySQL initialization failed:")
+    print(f"   Error: {str(e)}")
+    print("⚠️  Running in DEMO MODE ONLY")
     print("   To enable full features, setup MySQL database")
 
 # ─── File Upload Config ───────────────────────────────────────────
