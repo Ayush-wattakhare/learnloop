@@ -44,29 +44,7 @@ pip install flask flask-mysqldb werkzeug
    - Click "Start" for Apache and MySQL
    - Wait for both to show green "Running" status
 
-2. **Create Database**
-   - Open browser: `http://localhost/phpmyadmin`
-   - Click "New" in left sidebar
-   - Database name: `learnloop`
-   - Click "Create"
 
-3. **Import Schema**
-   - Click on `learnloop` database
-   - Go to "SQL" tab
-   - Open `database.sql` file from project folder
-   - Copy all SQL code and paste into SQL tab
-   - Click "Go" to execute
-
-### Step 3 — Run the Application
-```bash
-python app.py
-```
-
-### Step 4 — Access the App
-Open your browser and navigate to:
-```
-http://127.0.0.1:5000
-```
 
 ---
 
@@ -194,14 +172,13 @@ The application is fully responsive and works seamlessly on:
 
 ## 👨‍💻 Developer
 
-**BCA 2nd Year Student**  
-Invertis University, Bareilly, UP
+**Aysuh Wattakhare 
 
 ---
 
 ## 📄 License
 
-This project is created for educational purposes as part of BCA curriculum at Invertis University.
+This project is created for educational purposes as part selflearning.
 
 ---
 
