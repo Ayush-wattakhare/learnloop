@@ -255,6 +255,23 @@ def about():
 def features():
     return render_template('features.html')
 
+# ─── CONTACT ──────────────────────────────────────────────────────
+@app.route('/contact')
+def contact():
+    return render_template('contact.html')
+
+@app.route('/submit-contact', methods=['POST'])
+def submit_contact():
+    name = request.form.get('name')
+    email = request.form.get('email')
+    message_type = request.form.get('type')
+    message = request.form.get('message')
+    
+    # In a real app, you would save this to a database or send an email
+    # For now, just flash a success message
+    flash(f'Thank you {name}! Your message has been received. We\'ll get back to you at {email} soon.', 'success')
+    return redirect('/contact')
+
 # ─── DEMO MODE ────────────────────────────────────────────────────
 @app.route('/demo')
 def demo_mode():

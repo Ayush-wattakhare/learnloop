@@ -1,0 +1,262 @@
+{% extends "base_public.html" %}
+
+{% block title %}Contact Us - LearnLoop{% endblock %}
+
+{% block content %}
+<style>
+  .contact-hero {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 80px 32px 60px;
+    text-align: center;
+  }
+  
+  .contact-hero h1 {
+    font-size: 2.8rem;
+    font-weight: 800;
+    margin-bottom: 16px;
+  }
+  
+  .contact-hero p {
+    font-size: 1.15rem;
+    opacity: 0.95;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+  
+  .contact-container {
+    max-width: 1000px;
+    margin: -40px auto 80px;
+    padding: 0 32px;
+  }
+  
+  .contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    margin-bottom: 48px;
+  }
+  
+  .contact-card {
+    background: white;
+    border-radius: 16px;
+    padding: 40px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  }
+  
+  .contact-card h2 {
+    font-size: 1.8rem;
+    margin-bottom: 24px;
+    color: #1e293b;
+  }
+  
+  .form-group {
+    margin-bottom: 24px;
+  }
+  
+  .form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #334155;
+  }
+  
+  .form-group input,
+  .form-group textarea,
+  .form-group select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 1rem;
+    transition: border-color 0.2s;
+  }
+  
+  .form-group input:focus,
+  .form-group textarea:focus,
+  .form-group select:focus {
+    outline: none;
+    border-color: #667eea;
+  }
+  
+  .form-group textarea {
+    min-height: 150px;
+    resize: vertical;
+  }
+  
+  .btn-submit {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 14px 32px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  
+  .btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+  }
+  
+  .contact-info {
+    background: white;
+    border-radius: 16px;
+    padding: 40px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  }
+  
+  .contact-info h2 {
+    font-size: 1.8rem;
+    margin-bottom: 24px;
+    color: #1e293b;
+  }
+  
+  .info-item {
+    display: flex;
+    align-items: start;
+    gap: 16px;
+    margin-bottom: 24px;
+    padding: 16px;
+    background: #f8fafc;
+    border-radius: 12px;
+  }
+  
+  .info-icon {
+    font-size: 1.5rem;
+    min-width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 10px;
+  }
+  
+  .info-content h3 {
+    font-size: 1.1rem;
+    margin-bottom: 4px;
+    color: #1e293b;
+  }
+  
+  .info-content p {
+    color: #64748b;
+    margin: 0;
+  }
+  
+  .info-content a {
+    color: #667eea;
+    text-decoration: none;
+  }
+  
+  .info-content a:hover {
+    text-decoration: underline;
+  }
+  
+  @media (max-width: 768px) {
+    .contact-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .contact-hero h1 {
+      font-size: 2rem;
+    }
+  }
+</style>
+
+<!-- Hero Section -->
+<div class="contact-hero">
+  <h1>📧 Get in Touch</h1>
+  <p>Have questions, feedback, or need support? We're here to help! Reach out to us and we'll get back to you as soon as possible.</p>
+</div>
+
+<!-- Contact Container -->
+<div class="contact-container">
+  <div class="contact-grid">
+    <!-- Contact Form -->
+    <div class="contact-card">
+      <h2>Send us a Message</h2>
+      <form action="/submit-contact" method="POST">
+        <div class="form-group">
+          <label for="name">Your Name *</label>
+          <input type="text" id="name" name="name" required placeholder="John Doe">
+        </div>
+        
+        <div class="form-group">
+          <label for="email">Email Address *</label>
+          <input type="email" id="email" name="email" required placeholder="john@example.com">
+        </div>
+        
+        <div class="form-group">
+          <label for="type">Message Type *</label>
+          <select id="type" name="type" required>
+            <option value="">Select type...</option>
+            <option value="general">General Inquiry</option>
+            <option value="support">Technical Support</option>
+            <option value="feedback">Feedback</option>
+            <option value="complaint">Complaint</option>
+            <option value="feature">Feature Request</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="message">Your Message *</label>
+          <textarea id="message" name="message" required placeholder="Tell us what's on your mind..."></textarea>
+        </div>
+        
+        <button type="submit" class="btn-submit">Send Message</button>
+      </form>
+    </div>
+    
+    <!-- Contact Info -->
+    <div class="contact-info">
+      <h2>Contact Information</h2>
+      
+      <div class="info-item">
+        <div class="info-icon">📧</div>
+        <div class="info-content">
+          <h3>Email</h3>
+          <p><a href="mailto:support@learnloop.com">support@learnloop.com</a></p>
+        </div>
+      </div>
+      
+      <div class="info-item">
+        <div class="info-icon">💬</div>
+        <div class="info-content">
+          <h3>Live Chat</h3>
+          <p>Available Monday-Friday, 9AM-5PM</p>
+        </div>
+      </div>
+      
+      <div class="info-item">
+        <div class="info-icon">🎓</div>
+        <div class="info-content">
+          <h3>For Students</h3>
+          <p>Get help with your account, groups, or features</p>
+        </div>
+      </div>
+      
+      <div class="info-item">
+        <div class="info-icon">🐛</div>
+        <div class="info-content">
+          <h3>Report a Bug</h3>
+          <p>Help us improve by reporting issues</p>
+        </div>
+      </div>
+      
+      <div class="info-item">
+        <div class="info-icon">💡</div>
+        <div class="info-content">
+          <h3>Suggestions</h3>
+          <p>Share your ideas for new features</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
