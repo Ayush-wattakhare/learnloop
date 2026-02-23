@@ -37,6 +37,18 @@ def set_security_headers(response):
     # HTTPS enforcement in production
     if os.environ.get('PRODUCTION'):
         response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
+    
+    # Cache static assets for better performance
+    if request.path.startswith('/static/'):
+        # Cache CSS, JS, images for 7 days
+        if any(request.path.endswith(ext) for ext in ['.css', '.js', '.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico', '.woff', '.woff2']):
+            response.headers['Cache-Control'] = 'public, max-age=604800'  # 7 days
+    else:
+        # Don't cache dynamic pages
+        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '0'
+    
     return response
 
 # Session configuration

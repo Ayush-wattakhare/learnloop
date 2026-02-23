@@ -143,3 +143,14 @@
 </style>
 
 {% endblock %}
+
+{% block extra_css %}
+<!-- Cropper.js CSS - Only loaded on profile page -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
+{% endblock %}
+
+{% block extra_js %}
+<!-- Cropper.js Library - Only loaded on profile page -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
+<script src="{{ url_for('static', filename='js/profile-picture.js') }}"></script>
+{% endblock %}

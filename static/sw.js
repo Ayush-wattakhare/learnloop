@@ -1,11 +1,14 @@
-// LearnLoop Service Worker - Optimized
-const CACHE_NAME = 'learnloop-v1.1.0';
+// LearnLoop Service Worker - Optimized for Speed
+const CACHE_NAME = 'learnloop-v1.2.0';
 const urlsToCache = [
   '/',
   '/static/css/style.css',
   '/static/css/mobile-optimizations.css',
+  '/static/css/mobile-app-enhancements.css',
   '/static/js/main.js',
   '/static/js/performance.js',
+  '/static/js/mobile-app.js',
+  '/static/js/page-loader.js',
   '/static/manifest.json'
 ];
 
