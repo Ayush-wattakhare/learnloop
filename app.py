@@ -1360,11 +1360,11 @@ def mark_notification_read(notification_id):
     cur.close()
     return jsonify({'success': True})
 
+# Import and register voice room routes (must be outside if __name__ for production)
+from voice_room_routes import register_voice_room_routes
+register_voice_room_routes(app, mysql, socketio)
+
 if __name__ == '__main__':
-    # Import and register voice room routes
-    from voice_room_routes import register_voice_room_routes
-    register_voice_room_routes(app, mysql, socketio)
-    
     # Run on all network interfaces for mobile access
     # Access via: http://YOUR_IP:5000 from mobile on same WiFi
     socketio.run(app, debug=True, host='0.0.0.0', port=5000)
