@@ -3,107 +3,248 @@
 {% block title %}Notifications - LearnLoop{% endblock %}
 
 {% block content %}
-<div class="container" style="max-width: 800px;">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px">
-        <h3 style="font-weight:800; font-size:1.3rem">🔔 Notifications</h3>
+<div class="container" style="max-width: 1000px;">
+    <h3 style="font-weight:800; font-size:1.5rem; margin-bottom:24px">🔔 Notifications</h3>
+
+    <!-- Tabs -->
+    <div class="notification-tabs">
+        <button class="tab-btn active" onclick="switchTab('all')">All</button>
+        <button class="tab-btn" onclick="switchTab('requests')">Friend Requests</button>
+        <button class="tab-btn" onclick="switchTab('groups')">Groups</button>
+        <button class="tab-btn" onclick="switchTab('messages')">Messages</button>
     </div>
 
-    <div class="card">
-        <div class="card-body" style="padding:0">
-            {% if notifications %}
+    <!-- All Notifications Tab -->
+    <div id="allTab" class="tab-content active">
+        {% if notifications %}
+            <div class="notifications-list">
                 {% for notif in notifications %}
-                <div class="notification-item {% if not notif[5] %}unread{% endif %}">
+                <div class="notification-item {% if not notif[7] %}unread{% endif %}" data-id="{{ notif[0] }}">
                     <div class="notification-icon">
-                        {% if notif[1] == 'group_created' %}
-                            📚
-                        {% elif notif[1] == 'friend_request' %}
+                        {% if notif[2] == 'friend_request' %}
                             👥
-                        {% elif notif[1] == 'message' %}
+                        {% elif notif[2] == 'group_created' %}
+                            📚
+                        {% elif notif[2] == 'message' %}
                             💬
+                        {% elif notif[2] == 'group_invite' %}
+                            📨
                         {% else %}
                             🔔
                         {% endif %}
                     </div>
                     <div class="notification-content">
-                        <div class="notification-title">{{ notif[2] }}</div>
-                        <div class="notification-message">{{ notif[3] }}</div>
-                        <div class="notification-time">{{ notif[6].strftime('%b %d, %Y at %I:%M %p') }}</div>
+                        <div class="notification-title">{{ notif[3] }}</div>
+                        <div class="notification-message">{{ notif[4] }}</div>
+                        <div class="notification-time">{{ notif[8].strftime('%b %d, %I:%M %p') }}</div>
                     </div>
-                    {% if notif[4] %}
-                        <a href="{{ notif[4] }}" class="notification-action">
-                            View →
-                        </a>
+                    {% if notif[5] %}
+                        <a href="{{ notif[5] }}" class="notification-action-btn">View</a>
+                    {% endif %}
+                    <button class="notification-delete-btn" onclick="deleteNotification({{ notif[0] }})">×</button>
+                </div>
+                {% endfor %}
+            </div>
+            
+            {% if notifications|length > 0 %}
+            <div style="text-align:center; margin-top:20px">
+                <button class="btn btn-outline" onclick="markAllAsRead()">Mark All as Read</button>
+            </div>
+            {% endif %}
+        {% else %}
+            <div class="empty-state">
+                <p style="font-size:3rem">🔔</p>
+                <h4 style="font-weight:700; margin-bottom:8px">No Notifications</h4>
+                <p class="text-muted">You're all caught up!</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Friend Requests Tab -->
+    <div id="requestsTab" class="tab-content">
+        {% if friend_requests %}
+            <div class="friend-requests-list">
+                {% for request in friend_requests %}
+                <div class="friend-request-card" id="request-{{ request[0] }}">
+                    <div style="display:flex; align-items:center; gap:16px">
+                        {% if request[2] %}
+                            <img src="{{ url_for('static', filename='uploads/profiles/' + request[2]) }}" class="avatar-medium">
+                        {% else %}
+                            <div class="avatar avatar-md">{{ request[1][0].upper() }}</div>
+                        {% endif %}
+                        <div style="flex:1">
+                            <div style="font-weight:700; font-size:1rem">{{ request[1] }}</div>
+                            <div style="font-size:0.85rem; color:#6B7280">Sent {{ request[3].strftime('%b %d, %Y') }}</div>
+                        </div>
+                        <div style="display:flex; gap:8px">
+                            <button class="btn btn-primary btn-sm" onclick="acceptRequest({{ request[0] }})">
+                                ✓ Accept
+                            </button>
+                            <button class="btn btn-outline btn-sm" onclick="ignoreRequest({{ request[0] }})">
+                                ✕ Ignore
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <p style="font-size:3rem">👥</p>
+                <h4 style="font-weight:700; margin-bottom:8px">No Friend Requests</h4>
+                <p class="text-muted">No pending friend requests at the moment</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Groups Tab -->
+    <div id="groupsTab" class="tab-content">
+        {% set group_notifs = notifications|selectattr('2', 'equalto', 'group_created')|list + notifications|selectattr('2', 'equalto', 'group_invite')|list %}
+        {% if group_notifs %}
+            <div class="notifications-list">
+                {% for notif in group_notifs %}
+                <div class="notification-item {% if not notif[7] %}unread{% endif %}">
+                    <div class="notification-icon">📚</div>
+                    <div class="notification-content">
+                        <div class="notification-title">{{ notif[3] }}</div>
+                        <div class="notification-message">{{ notif[4] }}</div>
+                        <div class="notification-time">{{ notif[8].strftime('%b %d, %I:%M %p') }}</div>
+                    </div>
+                    {% if notif[5] %}
+                        <a href="{{ notif[5] }}" class="notification-action-btn">View</a>
                     {% endif %}
                 </div>
                 {% endfor %}
-            {% else %}
-                <div style="text-align:center; padding:60px 20px">
-                    <p style="font-size:3rem">🔔</p>
-                    <h4 style="font-weight:700; margin-bottom:8px">No Notifications</h4>
-                    <p class="text-muted">You're all caught up!</p>
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <p style="font-size:3rem">📚</p>
+                <h4 style="font-weight:700; margin-bottom:8px">No Group Notifications</h4>
+                <p class="text-muted">No group-related notifications</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Messages Tab -->
+    <div id="messagesTab" class="tab-content">
+        {% set message_notifs = notifications|selectattr('2', 'equalto', 'message')|list %}
+        {% if message_notifs %}
+            <div class="notifications-list">
+                {% for notif in message_notifs %}
+                <div class="notification-item {% if not notif[7] %}unread{% endif %}">
+                    <div class="notification-icon">💬</div>
+                    <div class="notification-content">
+                        <div class="notification-title">{{ notif[3] }}</div>
+                        <div class="notification-message">{{ notif[4] }}</div>
+                        <div class="notification-time">{{ notif[8].strftime('%b %d, %I:%M %p') }}</div>
+                    </div>
+                    {% if notif[5] %}
+                        <a href="{{ notif[5] }}" class="notification-action-btn">View</a>
+                    {% endif %}
                 </div>
-            {% endif %}
-        </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <p style="font-size:3rem">💬</p>
+                <h4 style="font-weight:700; margin-bottom:8px">No Message Notifications</h4>
+                <p class="text-muted">No message notifications</p>
+            </div>
+        {% endif %}
     </div>
 </div>
 
 <style>
+.notification-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    border-bottom: 2px solid #E5E7EB;
+    overflow-x: auto;
+}
+
+.tab-btn {
+    background: none;
+    border: none;
+    padding: 12px 20px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #6B7280;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.tab-btn:hover {
+    color: #2563EB;
+}
+
+.tab-btn.active {
+    color: #2563EB;
+    border-bottom-color: #2563EB;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.notifications-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
 .notification-item {
+    background: white;
+    border-radius: 12px;
+    padding: 16px;
     display: flex;
     align-items: center;
     gap: 16px;
-    padding: 20px;
-    border-bottom: 1px solid #E5E7EB;
-    transition: background 0.2s;
-}
-
-.notification-item:last-child {
-    border-bottom: none;
-}
-
-.notification-item:hover {
-    background: #F9FAFB;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    transition: all 0.2s;
+    position: relative;
 }
 
 .notification-item.unread {
     background: #EFF6FF;
+    border-left: 4px solid #2563EB;
 }
 
-.notification-item.unread:hover {
-    background: #DBEAFE;
+.notification-item:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
 }
 
 .notification-icon {
     font-size: 2rem;
-    width: 50px;
-    height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #F3F4F6;
-    border-radius: 50%;
-}
-
-.notification-item.unread .notification-icon {
-    background: #DBEAFE;
+    flex-shrink: 0;
 }
 
 .notification-content {
     flex: 1;
+    min-width: 0;
 }
 
 .notification-title {
     font-weight: 700;
     font-size: 0.95rem;
-    color: #111827;
     margin-bottom: 4px;
+    color: #111827;
 }
 
 .notification-message {
     font-size: 0.85rem;
     color: #6B7280;
-    line-height: 1.5;
     margin-bottom: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .notification-time {
@@ -111,22 +252,187 @@
     color: #9CA3AF;
 }
 
-.notification-action {
-    padding: 8px 16px;
+.notification-action-btn {
     background: #2563EB;
     color: white;
+    border: none;
+    padding: 8px 16px;
     border-radius: 8px;
-    text-decoration: none;
     font-size: 0.85rem;
     font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
     transition: all 0.2s;
-    white-space: nowrap;
+    flex-shrink: 0;
 }
 
-.notification-action:hover {
+.notification-action-btn:hover {
     background: #1D4ED8;
-    transform: translateX(2px);
+    transform: scale(1.05);
+}
+
+.notification-delete-btn {
+    background: #F3F4F6;
+    color: #6B7280;
+    border: none;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+.notification-delete-btn:hover {
+    background: #EF4444;
+    color: white;
+}
+
+.friend-requests-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.friend-request-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    transition: all 0.2s;
+}
+
+.friend-request-card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    background: white;
+    border-radius: 12px;
+}
+
+@media (max-width: 768px) {
+    .notification-item {
+        flex-wrap: wrap;
+    }
+    
+    .notification-action-btn {
+        width: 100%;
+        text-align: center;
+    }
+    
+    .friend-request-card > div {
+        flex-wrap: wrap;
+    }
+    
+    .friend-request-card > div > div:last-child {
+        width: 100%;
+        margin-top: 12px;
+    }
 }
 </style>
+
+<script>
+function switchTab(tabName) {
+    // Hide all tabs
+    document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    // Show selected tab
+    document.getElementById(tabName + 'Tab').classList.add('active');
+    event.target.classList.add('active');
+}
+
+function acceptRequest(userId) {
+    fetch(`/accept-friend-request/${userId}`, {
+        method: 'POST'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById(`request-${userId}`).remove();
+            showToast('Friend request accepted!', 'success');
+            
+            // Check if no more requests
+            if (document.querySelectorAll('.friend-request-card').length === 0) {
+                location.reload();
+            }
+        }
+    })
+    .catch(error => {
+        showToast('Error accepting request', 'error');
+    });
+}
+
+function ignoreRequest(userId) {
+    fetch(`/reject-friend-request/${userId}`, {
+        method: 'POST'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById(`request-${userId}`).remove();
+            showToast('Friend request ignored', 'info');
+            
+            // Check if no more requests
+            if (document.querySelectorAll('.friend-request-card').length === 0) {
+                location.reload();
+            }
+        }
+    })
+    .catch(error => {
+        showToast('Error ignoring request', 'error');
+    });
+}
+
+function deleteNotification(notifId) {
+    fetch(`/delete-notification/${notifId}`, {
+        method: 'POST'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.querySelector(`[data-id="${notifId}"]`).remove();
+            showToast('Notification deleted', 'success');
+        }
+    })
+    .catch(error => {
+        showToast('Error deleting notification', 'error');
+    });
+}
+
+function markAllAsRead() {
+    fetch('/mark-all-notifications-read', {
+        method: 'POST'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.querySelectorAll('.notification-item.unread').forEach(item => {
+                item.classList.remove('unread');
+            });
+            showToast('All notifications marked as read', 'success');
+        }
+    })
+    .catch(error => {
+        showToast('Error marking notifications as read', 'error');
+    });
+}
+
+function showToast(message, type) {
+    if (window.MobileApp && window.MobileApp.showToast) {
+        window.MobileApp.showToast(message, type);
+    } else {
+        alert(message);
+    }
+}
+</script>
 
 {% endblock %}

@@ -1345,7 +1345,7 @@ def notifications():
     
     # Get all notifications for current user
     cur.execute("""
-        SELECT id, type, title, message, link, is_read, created_at
+        SELECT *
         FROM notifications
         WHERE user_id = %s
         ORDER BY created_at DESC
@@ -1354,12 +1354,21 @@ def notifications():
     
     notifications_list = cur.fetchall()
     
-    # Mark all as read
-    cur.execute("UPDATE notifications SET is_read = TRUE WHERE user_id = %s", [session['user_id']])
-    mysql.connection.commit()
+    # Get pending friend requests
+    cur.execute("""
+        SELECT u.id, u.name, u.profile_picture, f.created_at
+        FROM friendships f
+        JOIN users u ON f.user_id = u.id
+        WHERE f.friend_id = %s AND f.status = 'pending'
+        ORDER BY f.created_at DESC
+    """, [session['user_id']])
+    
+    friend_requests = cur.fetchall()
     cur.close()
     
-    return render_template('notifications.html', notifications=notifications_list)
+    return render_template('notifications.html', 
+                         notifications=notifications_list,
+                         friend_requests=friend_requests)
 
 @app.route('/notifications/count')
 @login_required
@@ -1381,6 +1390,56 @@ def mark_notification_read(notification_id):
     mysql.connection.commit()
     cur.close()
     return jsonify({'success': True})
+
+@app.route('/mark-all-notifications-read', methods=['POST'])
+@login_required
+def mark_all_notifications_read():
+    """Mark all notifications as read"""
+    cur = mysql.connection.cursor()
+    cur.execute("UPDATE notifications SET is_read = TRUE WHERE user_id = %s", [session['user_id']])
+    mysql.connection.commit()
+    cur.close()
+    return jsonify({'success': True})
+
+@app.route('/delete-notification/<int:notification_id>', methods=['POST'])
+@login_required
+def delete_notification(notification_id):
+    """Delete a notification"""
+    cur = mysql.connection.cursor()
+    cur.execute("DELETE FROM notifications WHERE id = %s AND user_id = %s", 
+               [notification_id, session['user_id']])
+    mysql.connection.commit()
+    cur.close()
+    return jsonify({'success': True})
+
+@app.route('/api/latest-notifications')
+@login_required
+def latest_notifications():
+    """Get latest unread notifications for popup"""
+    cur = mysql.connection.cursor()
+    cur.execute("""
+        SELECT id, user_id, type, title, message, link, is_read, created_at
+        FROM notifications
+        WHERE user_id = %s AND is_read = FALSE
+        ORDER BY created_at DESC
+        LIMIT 5
+    """, [session['user_id']])
+    
+    notifications = cur.fetchall()
+    cur.close()
+    
+    # Convert to list of dicts
+    notif_list = []
+    for notif in notifications:
+        notif_list.append({
+            'id': notif[0],
+            'type': notif[2],
+            'title': notif[3],
+            'message': notif[4],
+            'link': notif[5]
+        })
+    
+    return jsonify({'notifications': notif_list})
 
 # Import and register voice room routes (must be outside if __name__ for production)
 from voice_room_routes import register_voice_room_routes
