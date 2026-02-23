@@ -293,8 +293,8 @@ def exit_demo():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if not DB_AVAILABLE:
-        flash('⚠️ Database not configured. Try demo mode instead!', 'warning')
-        return redirect('/demo')
+        flash('⚠️ Database connection error. Please try again later or contact support.', 'danger')
+        return render_template('register.html')
     
     if request.method == 'POST':
         # Rate limiting
@@ -346,8 +346,8 @@ def register():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if not DB_AVAILABLE:
-        flash('⚠️ Database not configured. Try demo mode instead!', 'warning')
-        return redirect('/demo')
+        flash('⚠️ Database connection error. Please try again later or contact support.', 'danger')
+        return render_template('login.html')
     
     if request.method == 'POST':
         # Rate limiting for login attempts
