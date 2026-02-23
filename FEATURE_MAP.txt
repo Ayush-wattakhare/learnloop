@@ -1,0 +1,299 @@
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                        LEARNLOOP FEATURE MAP                                 ║
+║                    All Features Fully Connected                              ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+                              ┌─────────────┐
+                              │   LOGIN     │
+                              │  REGISTER   │
+                              └──────┬──────┘
+                                     │
+                    ┌────────────────┼────────────────┐
+                    │                │                │
+              ┌─────▼─────┐    ┌────▼────┐    ┌─────▼─────┐
+              │ DASHBOARD │    │ PROFILE │    │  LOGOUT   │
+              └─────┬─────┘    └────┬────┘    └───────────┘
+                    │               │
+        ┌───────────┼───────────────┼───────────────┐
+        │           │               │               │
+   ┌────▼────┐ ┌───▼────┐    ┌────▼─────┐   ┌────▼─────┐
+   │  FIND   │ │ GROUPS │    │ MESSAGES │   │  VOICE   │
+   │PARTNERS │ │        │    │          │   │  ROOMS   │
+   └────┬────┘ └───┬────┘    └────┬─────┘   └────┬─────┘
+        │          │              │              │
+        │          │              │              │
+   ┌────▼──────────▼──────────────▼──────────────▼─────┐
+   │                                                     │
+   │              PROFILE PICTURE SYSTEM                │
+   │         (Shows in all features above)              │
+   │                                                     │
+   └─────────────────────────────────────────────────────┘
+
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                        FIND PARTNERS FLOW                                    ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+   ┌──────────────┐
+   │ Find Partners│
+   │ (Search)     │
+   └──────┬───────┘
+          │
+          ├─► Search by Topic ──────┐
+          │                         │
+          └─► Search by Language ───┤
+                                    │
+                              ┌─────▼──────┐
+                              │ View       │
+                              │ Profile    │
+                              └─────┬──────┘
+                                    │
+                              ┌─────▼──────┐
+                              │ Add Friend │
+                              │ (Request)  │
+                              └─────┬──────┘
+                                    │
+                              ┌─────▼──────┐
+                              │ Messages   │
+                              │ (Accept)   │
+                              └─────┬──────┘
+                                    │
+                              ┌─────▼──────┐
+                              │   Chat     │
+                              │ + Files    │
+                              │ + Voice    │
+                              └────────────┘
+
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                        MESSAGING SYSTEM FLOW                                 ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+   ┌──────────────┐
+   │  Messages    │
+   │  (Inbox)     │
+   └──────┬───────┘
+          │
+          ├─► Friend Requests ──► Accept/Reject
+          │
+          ├─► Conversations ────► Open Chat
+          │                           │
+          │                           ├─► Send Text
+          │                           ├─► Share Files
+          │                           │   ├─► Images
+          │                           │   ├─► PDFs
+          │                           │   └─► Documents
+          │                           │
+          │                           ├─► Voice Call
+          │                           └─► View Profile
+          │
+          └─► Unread Counter ───► Shows new messages
+
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                        STUDY GROUPS FLOW                                     ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+   ┌──────────────┐
+   │   Groups     │
+   │  (Browse)    │
+   └──────┬───────┘
+          │
+          ├─► Create Group ──────┐
+          │                      │
+          ├─► Filter Groups ─────┤
+          │   ├─► By Semester    │
+          │   └─► By Subject     │
+          │                      │
+          └─► Join Group ────────┤
+                                 │
+                           ┌─────▼──────┐
+                           │ Group Page │
+                           └─────┬──────┘
+                                 │
+                                 ├─► Group Chat
+                                 ├─► Share Notes
+                                 ├─► View Members
+                                 ├─► Edit (Creator)
+                                 ├─► Delete (Creator)
+                                 └─► Leave (Member)
+
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                        VOICE ROOMS FLOW                                      ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+   ┌──────────────┐
+   │ Voice Rooms  │
+   │  (Browse)    │
+   └──────┬───────┘
+          │
+          ├─► Create Room ───────┐
+          │   ├─► Video Room     │
+          │   └─► Audio Room     │
+          │                      │
+          ├─► Join by Code ──────┤
+          │                      │
+          ├─► Search Rooms ──────┤
+          │                      │
+          └─► Filter ────────────┤
+              ├─► Live Only      │
+              ├─► Video Rooms    │
+              └─► Audio Rooms    │
+                                 │
+                           ┌─────▼──────┐
+                           │ Voice Room │
+                           └─────┬──────┘
+                                 │
+                                 ├─► Start Session (Host)
+                                 ├─► Whiteboard
+                                 │   ├─► Draw
+                                 │   ├─► Text
+                                 │   └─► Erase
+                                 │
+                                 ├─► Room Chat
+                                 ├─► Stage Management
+                                 ├─► Edit (Host)
+                                 └─► Delete (Host)
+
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                        DATABASE CONNECTIONS                                  ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+   ┌─────────┐
+   │  USERS  │──────────────────────────────────────┐
+   └────┬────┘                                       │
+        │                                            │
+        ├──► friendships (user_id, friend_id)       │
+        │                                            │
+        ├──► direct_messages (sender_id, receiver_id)
+        │                                            │
+        ├──► groups (created_by) ──┐                │
+        │                           │                │
+        ├──► group_members ─────────┤                │
+        │                           │                │
+        ├──► voice_rooms (host_id) ─┤                │
+        │                           │                │
+        └──► room_participants ─────┘                │
+                                                     │
+   ┌─────────┐                                      │
+   │ GROUPS  │◄─────────────────────────────────────┘
+   └────┬────┘
+        │
+        ├──► group_members
+        ├──► messages
+        └──► notes
+
+   ┌──────────────┐
+   │ VOICE_ROOMS  │
+   └──────┬───────┘
+          │
+          ├──► room_participants
+          ├──► room_messages
+          ├──► whiteboard_snapshots
+          └──► stage_requests
+
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                        FILE UPLOAD CONNECTIONS                               ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+   static/uploads/
+        │
+        ├──► profiles/
+        │    └──► Profile pictures (PNG, JPG, JPEG, GIF, WEBP)
+        │         Shows in: Navigation, Messages, Chat, Groups, Voice Rooms
+        │
+        ├──► messages/
+        │    └──► Chat attachments (Images, PDFs, Documents)
+        │         Accessible in: Direct Messages
+        │
+        └──► notes/
+             └──► Group files (PDF, DOCX, PPTX, XLSX)
+                  Accessible in: Study Groups
+
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                        REAL-TIME FEATURES (Socket.IO)                        ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+   Socket.IO Events:
+   
+   ├──► new_message ──────► Direct Messages (Real-time delivery)
+   │
+   ├──► room_message ─────► Voice Room Chat (Instant updates)
+   │
+   ├──► whiteboard_draw ──► Whiteboard (Live drawing sync)
+   │
+   ├──► whiteboard_text ──► Text Tool (Real-time text)
+   │
+   ├──► host_status ──────► Host Online/Offline (Status updates)
+   │
+   └──► room_started ─────► Session Start (Notify participants)
+
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                        NAVIGATION STRUCTURE                                  ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+   Navbar (Always Visible)
+   │
+   ├──► Dashboard
+   ├──► Find Partners
+   ├──► 💬 Messages
+   ├──► Groups
+   ├──► 🎙️ Voice Rooms
+   │
+   └──► Profile Dropdown
+        ├──► 👤 My Profile
+        └──► 🚪 Logout
+
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                        SECURITY & PERMISSIONS                                ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+   Authentication Required:
+   ├──► All features (except Login/Register)
+   
+   Creator/Host Permissions:
+   ├──► Edit Group (Creator only)
+   ├──► Delete Group (Creator only)
+   ├──► Edit Voice Room (Host only)
+   ├──► Delete Voice Room (Host only)
+   └──► Start/End Session (Host only)
+   
+   Friend Permissions:
+   ├──► Send Direct Messages (Friends only)
+   ├──► View Email (Friends only)
+   ├──► Share Files (Friends only)
+   └──► Voice Call (Friends only)
+   
+   Member Permissions:
+   ├──► Leave Group (Members, not creator)
+   ├──► View Group Chat (Members only)
+   └──► Upload Notes (Members only)
+
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                        STATUS: ALL FEATURES CONNECTED ✅                     ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+   ✅ User Authentication
+   ✅ Profile System with Pictures
+   ✅ Find Partners (Topic/Language Search)
+   ✅ Friend Requests & Messaging
+   ✅ File Sharing (Images, PDFs, Docs)
+   ✅ Voice Calls (UI Ready)
+   ✅ Study Groups with Chat
+   ✅ Notes Sharing
+   ✅ Voice Rooms (Video/Audio)
+   ✅ Whiteboard with Drawing
+   ✅ Real-time Updates
+   ✅ Mobile Responsive
+   ✅ Secure & Scalable
+
+   🎉 READY FOR PRODUCTION 🎉
+

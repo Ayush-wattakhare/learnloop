@@ -1,0 +1,1182 @@
+{% extends "base.html" %}
+
+{% block title %}Voice Rooms - LearnLoop{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <!-- Enhanced Page Header with Gradient Background -->
+    <div class="hero-header-vr">
+        <div class="hero-content-vr">
+            <div class="header-left-vr">
+                <div class="icon-badge-large">🎙️</div>
+                <div>
+                    <h1 class="page-title-vr">Voice Rooms</h1>
+                    <p class="page-subtitle-vr">Join live study sessions with video, interactive whiteboard & real-time chat</p>
+                    <div class="stats-pills">
+                        <div class="stat-pill">
+                            <span class="pill-icon">🔴</span>
+                            <span class="pill-text">{{ rooms|length if rooms else 0 }} Active</span>
+                        </div>
+                        <div class="stat-pill">
+                            <span class="pill-icon">👥</span>
+                            <span class="pill-text">Join Anytime</span>
+                        </div>
+                        <div class="stat-pill">
+                            <span class="pill-icon">🎨</span>
+                            <span class="pill-text">Whiteboard</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="header-right-vr">
+                <button class="btn-vr btn-secondary-vr" onclick="showJoinByCodeModal()">
+                    <span class="btn-icon">🔑</span>
+                    <span>Join by Code</span>
+                </button>
+                <a href="/create-voice-room" class="btn-vr btn-primary-vr">
+                    <span class="btn-icon">✨</span>
+                    <span>Create Room</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Join by Code Modal -->
+    <div id="joinByCodeModal" class="modal-overlay" style="display: none;">
+        <div class="modal-box">
+            <div class="modal-header-new">
+                <h3>🔑 Join by Room Code</h3>
+                <button class="modal-close-btn" onclick="closeJoinByCodeModal()">×</button>
+            </div>
+            <div class="modal-body-new">
+                <p class="modal-description">Enter the 8-character room code to join directly</p>
+                <input type="text" id="roomCodeInput" class="code-input" placeholder="ABCD1234" maxlength="8">
+                <button class="btn-modal-primary" onclick="joinByCode()">Join Room →</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enhanced Search & Filter Section -->
+    <div class="search-filter-section">
+        <div class="search-box-enhanced">
+            <div class="search-input-wrapper">
+                <span class="search-icon-enhanced">🔍</span>
+                <input type="text" id="searchInput" placeholder="Search by room code, subject, or host name..." onkeyup="filterRooms()">
+                <span class="search-shortcut">Ctrl+K</span>
+            </div>
+        </div>
+        <div class="filter-section">
+            <div class="filter-label">Filter by:</div>
+            <div class="filter-chips-enhanced">
+                <button class="chip-enhanced chip-active" onclick="filterByStatus('all')">
+                    <span class="chip-icon">📋</span>
+                    <span>All Rooms</span>
+                </button>
+                <button class="chip-enhanced" onclick="filterByStatus('live')">
+                    <span class="chip-icon">🔴</span>
+                    <span>Live Now</span>
+                </button>
+                <button class="chip-enhanced" onclick="filterByStatus('video')">
+                    <span class="chip-icon">🎥</span>
+                    <span>Video</span>
+                </button>
+                <button class="chip-enhanced" onclick="filterByStatus('audio')">
+                    <span class="chip-icon">🎤</span>
+                    <span>Audio Only</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enhanced Rooms Grid -->
+    <div class="rooms-grid-enhanced" id="roomsGrid">
+        {% if rooms %}
+            {% for room in rooms %}
+            <div class="room-card-enhanced {% if room[6] %}room-live-enhanced{% endif %}" 
+                 data-room-code="{{ room[10] }}" 
+                 data-subject="{{ room[2] }}" 
+                 data-name="{{ room[1] }}"
+                 data-status="{% if room[6] %}live{% else %}ended{% endif %}"
+                 data-type="{{ room[7] }}">
+                
+                <!-- Animated Background Gradient -->
+                <div class="card-bg-gradient"></div>
+                
+                <!-- Card Content -->
+                <div class="card-content-enhanced">
+                    <!-- Top Section -->
+                    <div class="card-top-section">
+                        <div class="status-badge-enhanced {% if room[6] %}status-live-enhanced{% else %}status-ended-enhanced{% endif %}">
+                            <span class="status-dot-animated"></span>
+                            <span class="status-text">{% if room[6] %}LIVE NOW{% else %}ENDED{% endif %}</span>
+                        </div>
+                        <div class="room-type-badge">
+                            <span class="type-icon">{{ '🎥' if room[7] == 'video' else '🎤' }}</span>
+                            <span class="type-text">{{ 'Video' if room[7] == 'video' else 'Audio' }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Room Code Section -->
+                    <div class="code-section-enhanced">
+                        <div class="code-wrapper">
+                            <span class="code-label-enhanced">ROOM CODE</span>
+                            <div class="code-display">
+                                <span class="code-text-enhanced">{{ room[10] }}</span>
+                                <button class="copy-btn-enhanced" onclick="copyRoomCode('{{ room[10] }}')" title="Copy Code">
+                                    <span class="copy-icon-default">📋</span>
+                                    <span class="copy-icon-success" style="display:none;">✓</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Subject Tag -->
+                    <div class="subject-section">
+                        <span class="subject-tag-enhanced">
+                            <span class="subject-icon">📚</span>
+                            <span>{{ room[2] }}</span>
+                        </span>
+                    </div>
+
+                    <!-- Room Title & Description -->
+                    <div class="room-info-enhanced">
+                        <h3 class="room-title-enhanced">{{ room[1] }}</h3>
+                        <p class="room-desc-enhanced">{{ room[3] if room[3] else 'Join this interactive study session for collaborative learning and doubt clearing' }}</p>
+                    </div>
+
+                    <!-- Room Stats with Icons -->
+                    <div class="room-stats-enhanced">
+                        <div class="stat-item-enhanced">
+                            <div class="stat-icon-wrapper">
+                                <span class="stat-icon-enhanced">👤</span>
+                            </div>
+                            <div class="stat-content">
+                                <span class="stat-label">Host</span>
+                                <span class="stat-value">{{ room[13] if room[13] else 'Anonymous' }}</span>
+                            </div>
+                        </div>
+                        <div class="stat-divider"></div>
+                        <div class="stat-item-enhanced">
+                            <div class="stat-icon-wrapper">
+                                <span class="stat-icon-enhanced">👥</span>
+                            </div>
+                            <div class="stat-content">
+                                <span class="stat-label">On Stage</span>
+                                <span class="stat-value">{{ room[14] }}/6</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="card-actions-enhanced">
+                        {% if room[6] %}
+                            {% if room[4]|int == session.user_id|int %}
+                            <!-- Host Actions -->
+                            <a href="/voice-room/{{ room[10] }}" class="btn-card-enhanced btn-enter-enhanced">
+                                <span class="btn-card-icon">🚪</span>
+                                <span>Enter Your Room</span>
+                                <span class="btn-arrow">→</span>
+                            </a>
+                            <div class="action-btns-row">
+                                <a href="/edit-voice-room/{{ room[10] }}" class="icon-btn-enhanced" title="Edit Room">
+                                    <span>✏️</span>
+                                </a>
+                                <button class="icon-btn-enhanced icon-danger-enhanced" onclick="deleteRoomFromList('{{ room[10] }}')" title="Delete Room">
+                                    <span>🗑️</span>
+                                </button>
+                            </div>
+                            {% else %}
+                            <!-- Join Button -->
+                            <a href="/voice-room/{{ room[10] }}" class="btn-card-enhanced btn-join-enhanced">
+                                <span class="btn-card-icon">🎯</span>
+                                <span>Join Session</span>
+                                <span class="btn-arrow">→</span>
+                            </a>
+                            {% endif %}
+                        {% else %}
+                        <button class="btn-card-enhanced btn-disabled-enhanced" disabled>
+                            <span class="btn-card-icon">🔒</span>
+                            <span>Room Ended</span>
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Hover Effect Overlay -->
+                <div class="card-hover-overlay"></div>
+            </div>
+            {% endfor %}
+        {% else %}
+        <div class="empty-state-enhanced">
+            <div class="empty-animation">
+                <div class="empty-icon-circle">
+                    <span class="empty-icon">🎙️</span>
+                </div>
+            </div>
+            <h3 class="empty-title">No Active Voice Rooms</h3>
+            <p class="empty-description">Be the first to start an interactive study session! Create a room and invite your classmates to join.</p>
+            <a href="/create-voice-room" class="btn-empty-enhanced">
+                <span class="btn-icon">✨</span>
+                <span>Create Your First Room</span>
+                <span class="btn-arrow">→</span>
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+<style>
+/* Enhanced Hero Header */
+.hero-header-vr {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 20px;
+    padding: 40px;
+    margin-bottom: 32px;
+    box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-header-vr::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255,255,255,0.1) 0%, transparent 50%);
+    opacity: 0.5;
+}
+
+.hero-content-vr {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+}
+
+.header-left-vr {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    flex: 1;
+}
+
+.icon-badge-large {
+    width: 70px;
+    height: 70px;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.2rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-5px); }
+}
+
+.page-title-vr {
+    font-size: 2rem;
+    font-weight: 800;
+    color: white;
+    margin: 0 0 8px 0;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.page-subtitle-vr {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.9);
+    margin: 0 0 12px 0;
+    line-height: 1.5;
+}
+
+.stats-pills {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.stat-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    font-size: 0.85rem;
+    color: white;
+    font-weight: 600;
+}
+
+.header-right-vr {
+    display: flex;
+    gap: 12px;
+}
+
+.btn-vr {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.btn-primary-vr {
+    background: white;
+    color: #667eea;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-primary-vr:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+.btn-secondary-vr {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.btn-secondary-vr:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+/* Search & Filter */
+.search-filter-section {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 32px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+    border: 1px solid #E5E7EB;
+}
+
+.search-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.search-icon-enhanced {
+    position: absolute;
+    left: 16px;
+    font-size: 1.2rem;
+    color: #9CA3AF;
+}
+
+.search-input-wrapper input {
+    width: 100%;
+    padding: 14px 14px 14px 50px;
+    border: 2px solid #E5E7EB;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    transition: all 0.3s;
+    background: #F9FAFB;
+}
+
+.search-input-wrapper input:focus {
+    outline: none;
+    border-color: #667eea;
+    background: white;
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+}
+
+.search-shortcut {
+    position: absolute;
+    right: 16px;
+    padding: 4px 10px;
+    background: #E5E7EB;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #6B7280;
+}
+
+.filter-section {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.filter-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #6B7280;
+}
+
+.filter-chips-enhanced {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    flex: 1;
+}
+
+.chip-enhanced {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 18px;
+    border: 2px solid #E5E7EB;
+    background: white;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    color: #6B7280;
+}
+
+.chip-enhanced:hover {
+    border-color: #667eea;
+    background: #F9FAFB;
+    transform: translateY(-2px);
+}
+
+.chip-active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+/* Rooms Grid */
+.rooms-grid-enhanced {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 24px;
+}
+
+/* Room Card */
+.room-card-enhanced {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 2px solid #E5E7EB;
+    position: relative;
+    overflow: hidden;
+}
+
+.room-card-enhanced:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+    border-color: #667eea;
+}
+
+.room-live-enhanced {
+    border-color: #10B981;
+}
+
+.card-bg-gradient {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #667eea 100%);
+    background-size: 200% 100%;
+    animation: gradientShift 3s ease infinite;
+}
+
+@keyframes gradientShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+.card-content-enhanced {
+    padding: 24px;
+    position: relative;
+    z-index: 1;
+}
+
+.card-top-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.status-badge-enhanced {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.status-live-enhanced {
+    background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.status-ended-enhanced {
+    background: #F3F4F6;
+    color: #6B7280;
+}
+
+.status-dot-animated {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: currentColor;
+    animation: pulse-dot 2s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.2); }
+}
+
+.room-type-badge {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 12px;
+    background: #F9FAFB;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #6B7280;
+}
+
+.code-section-enhanced {
+    margin-bottom: 16px;
+}
+
+.code-wrapper {
+    background: linear-gradient(135deg, #F9FAFB 0%, #F3F4F6 100%);
+    border: 2px dashed #D1D5DB;
+    border-radius: 12px;
+    padding: 12px 16px;
+}
+
+.code-label-enhanced {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #9CA3AF;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+}
+
+.code-display {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.code-text-enhanced {
+    font-family: 'Courier New', monospace;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #667eea;
+    letter-spacing: 3px;
+}
+
+.copy-btn-enhanced {
+    background: white;
+    border: 1px solid #E5E7EB;
+    border-radius: 8px;
+    padding: 6px 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 1.1rem;
+}
+
+.copy-btn-enhanced:hover {
+    background: #667eea;
+    border-color: #667eea;
+    transform: scale(1.1);
+}
+
+.subject-tag-enhanced {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 14px;
+    background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%);
+    color: #2563EB;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+.room-title-enhanced {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #111827;
+    margin: 0 0 8px 0;
+    line-height: 1.4;
+}
+
+.room-desc-enhanced {
+    font-size: 0.9rem;
+    color: #6B7280;
+    line-height: 1.5;
+    margin: 0 0 16px 0;
+}
+
+.room-stats-enhanced {
+    display: flex;
+    gap: 16px;
+    padding: 14px 0;
+    border-top: 1px solid #E5E7EB;
+    border-bottom: 1px solid #E5E7EB;
+    margin-bottom: 16px;
+}
+
+.stat-item-enhanced {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+}
+
+.stat-icon-wrapper {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, #F9FAFB 0%, #F3F4F6 100%);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.stat-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-label {
+    font-size: 0.7rem;
+    color: #9CA3AF;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.stat-value {
+    font-size: 0.9rem;
+    color: #111827;
+    font-weight: 700;
+}
+
+.stat-divider {
+    width: 1px;
+    background: #E5E7EB;
+}
+
+.card-actions-enhanced {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-card-enhanced {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-decoration: none;
+}
+
+.btn-enter-enhanced {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.btn-enter-enhanced:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.btn-join-enhanced {
+    background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.btn-join-enhanced:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+}
+
+.btn-disabled-enhanced {
+    background: #F3F4F6;
+    color: #9CA3AF;
+    cursor: not-allowed;
+}
+
+.btn-arrow {
+    transition: transform 0.3s;
+}
+
+.btn-card-enhanced:hover .btn-arrow {
+    transform: translateX(4px);
+}
+
+.action-btns-row {
+    display: flex;
+    gap: 8px;
+}
+
+.icon-btn-enhanced {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    border: 2px solid #E5E7EB;
+    background: white;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.icon-btn-enhanced:hover {
+    border-color: #667eea;
+    background: #F9FAFB;
+    transform: scale(1.1);
+}
+
+.icon-danger-enhanced:hover {
+    border-color: #EF4444;
+    background: #FEE2E2;
+}
+
+.card-hover-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+}
+
+.room-card-enhanced:hover .card-hover-overlay {
+    opacity: 1;
+}
+
+/* Empty State */
+.empty-state-enhanced {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 80px 20px;
+}
+
+.empty-icon-circle {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 24px;
+    background: linear-gradient(135deg, #F9FAFB 0%, #F3F4F6 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: float 3s ease-in-out infinite;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.empty-icon {
+    font-size: 3.5rem;
+}
+
+.empty-title {
+    font-size: 1.5rem;
+    color: #111827;
+    font-weight: 700;
+    margin: 0 0 12px 0;
+}
+
+.empty-description {
+    color: #6B7280;
+    margin: 0 0 28px 0;
+    font-size: 1rem;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.btn-empty-enhanced {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 32px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s;
+    box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+}
+
+.btn-empty-enhanced:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+}
+
+/* Modal */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    backdrop-filter: blur(3px);
+}
+
+.modal-box {
+    background: white;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 450px;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.2);
+    animation: modalSlideIn 0.3s ease;
+}
+
+@keyframes modalSlideIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.modal-header-new {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px;
+    border-bottom: 1px solid #E5E7EB;
+}
+
+.modal-header-new h3 {
+    margin: 0;
+    font-size: 1.3rem;
+    color: #111827;
+    font-weight: 700;
+}
+
+.modal-close-btn {
+    background: none;
+    border: none;
+    font-size: 1.8rem;
+    cursor: pointer;
+    color: #6B7280;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+
+.modal-close-btn:hover {
+    background: #F3F4F6;
+    color: #111827;
+}
+
+.modal-body-new {
+    padding: 24px;
+}
+
+.modal-description {
+    color: #6B7280;
+    margin: 0 0 16px 0;
+    font-size: 0.9rem;
+}
+
+.code-input {
+    width: 100%;
+    padding: 14px;
+    border: 1px solid #E5E7EB;
+    border-radius: 10px;
+    font-size: 1.2rem;
+    font-family: 'Courier New', monospace;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    text-align: center;
+    font-weight: 700;
+    color: #667eea;
+    margin-bottom: 16px;
+    transition: all 0.2s;
+}
+
+.code-input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.btn-modal-primary {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-modal-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(102, 126, 234, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .hero-content-vr {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .header-left-vr {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .header-right-vr {
+        width: 100%;
+        flex-direction: column;
+    }
+    
+    .btn-vr {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .filter-section {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .rooms-grid-enhanced {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<script>
+let currentFilter = 'all';
+
+function filterRooms() {
+    const searchInput = document.getElementById('searchInput').value.toLowerCase();
+    const cards = document.querySelectorAll('.room-card-enhanced');
+    let visibleCount = 0;
+    
+    cards.forEach(card => {
+        const roomCode = card.dataset.roomCode.toLowerCase();
+        const subject = card.dataset.subject.toLowerCase();
+        const name = card.dataset.name.toLowerCase();
+        const status = card.dataset.status;
+        const type = card.dataset.type;
+        
+        const searchMatch = roomCode.includes(searchInput) || 
+                          subject.includes(searchInput) || 
+                          name.includes(searchInput);
+        
+        let filterMatch = true;
+        if (currentFilter === 'live') {
+            filterMatch = status === 'live';
+        } else if (currentFilter === 'video') {
+            filterMatch = type === 'video';
+        } else if (currentFilter === 'audio') {
+            filterMatch = type === 'audio';
+        }
+        
+        if (searchMatch && filterMatch) {
+            card.style.display = 'block';
+            visibleCount++;
+        } else {
+            card.style.display = 'none';
+        }
+    });
+    
+    showEmptyState(visibleCount === 0);
+}
+
+function filterByStatus(status) {
+    currentFilter = status;
+    
+    document.querySelectorAll('.chip-enhanced').forEach(btn => {
+        btn.classList.remove('chip-active');
+    });
+    event.target.closest('.chip-enhanced').classList.add('chip-active');
+    
+    filterRooms();
+}
+
+function showEmptyState(show) {
+    let emptyState = document.querySelector('.empty-state-search');
+    
+    if (show) {
+        if (!emptyState) {
+            emptyState = document.createElement('div');
+            emptyState.className = 'empty-state-enhanced empty-state-search';
+            emptyState.innerHTML = `
+                <div class="empty-animation">
+                    <div class="empty-icon-circle">
+                        <span class="empty-icon">🔍</span>
+                    </div>
+                </div>
+                <h3 class="empty-title">No Rooms Found</h3>
+                <p class="empty-description">Try adjusting your search or filters</p>
+            `;
+            document.getElementById('roomsGrid').appendChild(emptyState);
+        }
+        emptyState.style.display = 'block';
+    } else if (emptyState) {
+        emptyState.style.display = 'none';
+    }
+}
+
+function copyRoomCode(roomCode) {
+    navigator.clipboard.writeText(roomCode).then(() => {
+        const btn = event.target.closest('.copy-btn-enhanced');
+        const defaultIcon = btn.querySelector('.copy-icon-default');
+        const successIcon = btn.querySelector('.copy-icon-success');
+        
+        defaultIcon.style.display = 'none';
+        successIcon.style.display = 'inline';
+        btn.style.background = '#10B981';
+        btn.style.borderColor = '#10B981';
+        btn.style.color = 'white';
+        
+        setTimeout(() => {
+            defaultIcon.style.display = 'inline';
+            successIcon.style.display = 'none';
+            btn.style.background = 'white';
+            btn.style.borderColor = '#E5E7EB';
+            btn.style.color = '';
+        }, 2000);
+    }).catch(err => {
+        alert('Failed to copy room code');
+    });
+}
+
+function showJoinByCodeModal() {
+    document.getElementById('joinByCodeModal').style.display = 'flex';
+    document.getElementById('roomCodeInput').focus();
+}
+
+function closeJoinByCodeModal() {
+    document.getElementById('joinByCodeModal').style.display = 'none';
+    document.getElementById('roomCodeInput').value = '';
+}
+
+function joinByCode() {
+    const roomCode = document.getElementById('roomCodeInput').value.trim().toUpperCase();
+    
+    if (!roomCode) {
+        alert('Please enter a room code');
+        return;
+    }
+    
+    if (roomCode.length !== 8) {
+        alert('Room code must be 8 characters');
+        return;
+    }
+    
+    window.location.href = '/voice-room/' + roomCode;
+}
+
+function deleteRoomFromList(roomCode) {
+    if (confirm('Are you sure you want to delete this voice room? This action cannot be undone!')) {
+        fetch('/delete-voice-room/' + roomCode, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Voice room deleted successfully!');
+                window.location.reload();
+            } else {
+                alert('Error: ' + (data.error || 'Failed to delete room'));
+            }
+        })
+        .catch(error => {
+            alert('Error deleting room: ' + error);
+        });
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const roomCodeInput = document.getElementById('roomCodeInput');
+    if (roomCodeInput) {
+        roomCodeInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                joinByCode();
+            }
+        });
+        
+        roomCodeInput.addEventListener('input', function(e) {
+            e.target.value = e.target.value.toUpperCase();
+        });
+    }
+    
+    const modal = document.getElementById('joinByCodeModal');
+    if (modal) {
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                closeJoinByCodeModal();
+            }
+        });
+    }
+    
+    // Keyboard shortcut for search (Ctrl+K)
+    document.addEventListener('keydown', function(e) {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+            e.preventDefault();
+            document.getElementById('searchInput').focus();
+        }
+    });
+});
+</script>
+
+{% endblock %}

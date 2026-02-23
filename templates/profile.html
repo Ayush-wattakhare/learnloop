@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block title %}Profile — LearnLoop{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width:600px">
+  <div style="margin-bottom:24px; text-align:center">
+    <div class="profile-picture-container">
+      {% if user[8] %}
+        <img src="{{ url_for('static', filename='uploads/profiles/' + user[8]) }}" alt="Profile" class="profile-picture-large">
+      {% else %}
+        <div class="avatar avatar-lg" style="width:100px; height:100px; font-size:2.5rem; margin:0 auto">
+          {{ user[1][0].upper() }}
+        </div>
+      {% endif %}
+      <button class="change-picture-btn" onclick="document.getElementById('profilePictureInput').click()">
+        📷 Change Picture
+      </button>
+    </div>
+    <h3 style="font-weight:800; font-size:1.3rem; margin-top:16px">Edit Your Profile</h3>
+    <p class="text-muted">Update your information and preferences</p>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <!-- Profile Picture Upload Form -->
+      <form id="profilePictureForm" method="POST" action="/upload-profile-picture" enctype="multipart/form-data" style="display:none">
+        <input type="file" id="profilePictureInput" name="profile_picture" accept="image/*" onchange="uploadProfilePicture()">
+      </form>
+
+      <!-- Profile Info Form -->
+      <form method="POST" action="/profile">
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input class="form-control" type="text" name="name" value="{{ user[1] }}" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <input class="form-control" type="email" value="{{ user[2] }}" disabled style="background:var(--gray-100); cursor:not-allowed">
+          <small class="text-muted">Email cannot be changed</small>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Semester</label>
+          <select class="form-control" name="semester" required>
+            <option value="1" {% if user[4] == 1 %}selected{% endif %}>Semester 1</option>
+            <option value="2" {% if user[4] == 2 %}selected{% endif %}>Semester 2</option>
+            <option value="3" {% if user[4] == 3 %}selected{% endif %}>Semester 3</option>
+            <option value="4" {% if user[4] == 4 %}selected{% endif %}>Semester 4</option>
+            <option value="5" {% if user[4] == 5 %}selected{% endif %}>Semester 5</option>
+            <option value="6" {% if user[4] == 6 %}selected{% endif %}>Semester 6</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">College</label>
+          <input class="form-control" type="text" name="college" value="{{ user[5] }}" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Bio</label>
+          <textarea class="form-control" name="bio" placeholder="Tell others about yourself, your interests, study preferences...">{{ user[6] if user[6] else '' }}</textarea>
+        </div>
+
+        <div style="display:flex; gap:10px">
+          <button type="submit" class="btn btn-primary" style="flex:1; justify-content:center">
+            Save Changes
+          </button>
+          <a href="/dashboard" class="btn btn-outline">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div style="margin-top:20px; text-align:center">
+    <p class="text-muted" style="font-size:0.8rem">
+      Member since {{ user[7].strftime('%B %Y') if user[7] else 'Recently' }}
+    </p>
+  </div>
+</div>
+
+<style>
+.profile-picture-container {
+  position: relative;
+  display: inline-block;
+}
+
+.profile-picture-large {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid white;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.change-picture-btn {
+  position: absolute;
+  bottom: 0;
+  right: -10px;
+  background: linear-gradient(135deg, #2563EB, #4338CA);
+  color: white;
+  border: 3px solid white;
+  border-radius: 20px;
+  padding: 6px 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  transition: all 0.2s;
+}
+
+.change-picture-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+}
+</style>
+
+<script>
+function uploadProfilePicture() {
+  const form = document.getElementById('profilePictureForm');
+  const formData = new FormData(form);
+  
+  fetch('/upload-profile-picture', {
+    method: 'POST',
+    body: formData
+  })
+  .then(response => {
+    if (!response.ok) {
+      return response.text().then(text => {
+        console.error('Server response:', text);
+        throw new Error(`Server error: ${response.status}`);
+      });
+    }
+    return response.json();
+  })
+  .then(data => {
+    if (data.success) {
+      alert('Profile picture updated successfully!');
+      window.location.reload();
+    } else {
+      alert('Error: ' + (data.error || 'Failed to upload picture'));
+    }
+  })
+  .catch(error => {
+    console.error('Upload error:', error);
+    alert('Error uploading picture: ' + error.message);
+  });
+}
+</script>
+
+{% endblock %}

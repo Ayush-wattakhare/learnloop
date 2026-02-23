@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+  <title>{% block title %}LearnLoop{% endblock %}</title>
+  
+  <!-- PWA Meta Tags -->
+  <meta name="description" content="Connect with study partners, share notes, and collaborate. LearnLoop - Where Learning Connects.">
+  <meta name="theme-color" content="#2563EB">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="LearnLoop">
+  <meta name="mobile-web-app-capable" content="yes">
+  
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="/static/manifest.json">
+  
+  <!-- Icons -->
+  <link rel="icon" type="image/png" sizes="192x192" href="/static/icons/icon-192x192.png">
+  <link rel="apple-touch-icon" href="/static/icons/icon-192x192.png">
+  
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+  <!-- Navbar -->
+  <div class="navbar">
+    <a href="/" class="navbar-brand"><span>📚</span> LearnLoop</a>
+    <div class="navbar-links">
+      {% if session.user_id %}
+        {% if session.demo_mode %}
+          <span class="nav-link" style="background:rgba(255,255,255,0.2); color:#FCD34D; font-weight:700">🎭 DEMO MODE</span>
+        {% endif %}
+        <a href="/dashboard" class="nav-link">Dashboard</a>
+        <a href="/find-partners" class="nav-link">Find Partners</a>
+        <a href="/messages" class="nav-link">💬 Messages</a>
+        <a href="/groups" class="nav-link">Groups</a>
+        <a href="/voice-rooms" class="nav-link">🎙️ Voice Rooms</a>
+        
+        <!-- Notifications Bell -->
+        <a href="/notifications" class="nav-link notification-bell" id="notificationBell">
+          🔔
+          <span class="notification-badge" id="notificationBadge" style="display:none">0</span>
+        </a>
+        
+        <!-- Dark Mode Toggle -->
+        <button class="dark-mode-toggle" onclick="toggleDarkMode()" title="Toggle Dark Mode">
+          <span class="dark-mode-icon light-icon">🌙</span>
+          <span class="dark-mode-icon dark-icon" style="display:none;">☀️</span>
+        </button>
+        
+        <!-- Profile Dropdown -->
+        <div class="profile-dropdown">
+          <button class="profile-btn" onclick="toggleProfileMenu()">
+            <div class="profile-avatar">{{ session.user_name[0].upper() }}</div>
+            <span>{{ session.user_name }}</span>
+            <span class="dropdown-arrow">▼</span>
+          </button>
+          <div class="profile-menu" id="profileMenu">
+            <a href="/profile" class="profile-menu-item">
+              <span class="menu-icon">👤</span>
+              <span>My Profile</span>
+            </a>
+            {% if session.demo_mode %}
+              <a href="/exit-demo" class="profile-menu-item">
+                <span class="menu-icon">🚪</span>
+                <span>Exit Demo</span>
+              </a>
+            {% else %}
+              <a href="/logout" class="profile-menu-item logout-item">
+                <span class="menu-icon">🚪</span>
+                <span>Logout</span>
+              </a>
+            {% endif %}
+          </div>
+        </div>
+      {% else %}
+        <a href="/" class="nav-link">Home</a>
+        
+        <!-- Dark Mode Toggle for non-logged in users -->
+        <button class="dark-mode-toggle" onclick="toggleDarkMode()" title="Toggle Dark Mode">
+          <span class="dark-mode-icon light-icon">🌙</span>
+          <span class="dark-mode-icon dark-icon" style="display:none;">☀️</span>
+        </button>
+        
+        <a href="/login" class="nav-link">Login</a>
+        <a href="/register"><button class="nav-badge">Get Started →</button></a>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Flash Messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="container" style="padding-top: 20px;">
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <!-- Main Content -->
+  {% block content %}{% endblock %}
+
+  <!-- Notification Bell Styles -->
+  <style>
+    .notification-bell {
+      position: relative;
+    }
+
+    .notification-badge {
+      position: absolute;
+      top: 2px;
+      right: 6px;
+      background: #EF4444;
+      color: white;
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 2px 5px;
+      border-radius: 10px;
+      min-width: 18px;
+      text-align: center;
+    }
+  </style>
+
+  <!-- Scripts -->
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  
+  <!-- Profile Dropdown Script -->
+  <script>
+    function toggleProfileMenu() {
+      const menu = document.getElementById('profileMenu');
+      menu.classList.toggle('show');
+    }
+    
+    // Close dropdown when clicking outside
+    window.addEventListener('click', function(e) {
+      if (!e.target.closest('.profile-dropdown')) {
+        const menu = document.getElementById('profileMenu');
+        if (menu) {
+          menu.classList.remove('show');
+        }
+      }
+    });
+    
+    // Update notification count
+    function updateNotificationCount() {
+      fetch('/notifications/count')
+        .then(response => response.json())
+        .then(data => {
+          const badge = document.getElementById('notificationBadge');
+          if (badge && data.count > 0) {
+            badge.textContent = data.count;
+            badge.style.display = 'block';
+          } else if (badge) {
+            badge.style.display = 'none';
+          }
+        })
+        .catch(error => console.error('Error fetching notification count:', error));
+    }
+    
+    // Update notification count on page load and every 30 seconds
+    {% if session.user_id %}
+    updateNotificationCount();
+    setInterval(updateNotificationCount, 30000);
+    {% endif %}
+  </script>
+  
+  <!-- PWA Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/static/sw.js')
+          .then(registration => {
+            console.log('✅ Service Worker registered:', registration.scope);
+            
+            // Check for updates
+            registration.addEventListener('updatefound', () => {
+              const newWorker = registration.installing;
+              newWorker.addEventListener('statechange', () => {
+                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                  // New version available
+                  if (confirm('New version available! Reload to update?')) {
+                    newWorker.postMessage({ type: 'SKIP_WAITING' });
+                    window.location.reload();
+                  }
+                }
+              });
+            });
+          })
+          .catch(error => {
+            console.log('❌ Service Worker registration failed:', error);
+          });
+      });
+      
+      // Handle service worker updates
+      let refreshing;
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (refreshing) return;
+        refreshing = true;
+        window.location.reload();
+      });
+    }
+    
+    // Install prompt for PWA
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      
+      // Show install button/banner
+      const installBanner = document.createElement('div');
+      installBanner.innerHTML = `
+        <div style="position:fixed; bottom:20px; left:20px; right:20px; background:linear-gradient(135deg,#2563EB,#4338CA); color:white; padding:16px 20px; border-radius:12px; box-shadow:0 8px 24px rgba(0,0,0,0.2); z-index:1000; display:flex; align-items:center; justify-content:space-between; animation:slideUp 0.3s ease;">
+          <div>
+            <div style="font-weight:700; margin-bottom:4px">📱 Install LearnLoop</div>
+            <div style="font-size:0.85rem; opacity:0.9">Add to home screen for quick access</div>
+          </div>
+          <button onclick="installPWA()" style="background:white; color:#2563EB; border:none; padding:8px 16px; border-radius:8px; font-weight:600; cursor:pointer; margin-left:12px">Install</button>
+          <button onclick="this.parentElement.remove()" style="background:transparent; color:white; border:none; padding:8px; cursor:pointer; margin-left:8px; font-size:1.2rem">×</button>
+        </div>
+      `;
+      document.body.appendChild(installBanner);
+    });
+    
+    function installPWA() {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choiceResult) => {
+          if (choiceResult.outcome === 'accepted') {
+            console.log('✅ PWA installed');
+          }
+          deferredPrompt = null;
+          document.querySelector('[onclick="installPWA()"]').parentElement.remove();
+        });
+      }
+    }
+    
+    // Detect if running as PWA
+    if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+      console.log('📱 Running as PWA');
+      document.body.classList.add('pwa-mode');
+    }
+  </script>
+  
+  <!-- Dark Mode Script -->
+  <script>
+    // Dark Mode Toggle Function
+    function toggleDarkMode() {
+      const body = document.body;
+      const lightIcon = document.querySelector('.light-icon');
+      const darkIcon = document.querySelector('.dark-icon');
+      
+      body.classList.toggle('dark-mode');
+      
+      // Toggle icons
+      if (body.classList.contains('dark-mode')) {
+        lightIcon.style.display = 'none';
+        darkIcon.style.display = 'inline';
+        localStorage.setItem('darkMode', 'enabled');
+      } else {
+        lightIcon.style.display = 'inline';
+        darkIcon.style.display = 'none';
+        localStorage.setItem('darkMode', 'disabled');
+      }
+    }
+    
+    // Check for saved dark mode preference on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      const darkMode = localStorage.getItem('darkMode');
+      const lightIcon = document.querySelector('.light-icon');
+      const darkIcon = document.querySelector('.dark-icon');
+      
+      if (darkMode === 'enabled') {
+        document.body.classList.add('dark-mode');
+        if (lightIcon && darkIcon) {
+          lightIcon.style.display = 'none';
+          darkIcon.style.display = 'inline';
+        }
+      }
+    });
+  </script>
+  
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

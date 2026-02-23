@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>LearnLoop Icon Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 { color: #2563EB; }
+        canvas {
+            border: 2px solid #ddd;
+            margin: 10px;
+            border-radius: 8px;
+        }
+        .icons-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .icon-item {
+            text-align: center;
+        }
+        button {
+            background: #2563EB;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+        }
+        button:hover {
+            background: #1D4ED8;
+        }
+        .info {
+            background: #EFF6FF;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #2563EB;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📚 LearnLoop Icon Generator</h1>
+        
+        <div class="info">
+            <strong>Instructions:</strong>
+            <ol>
+                <li>Click "Generate All Icons" button below</li>
+                <li>Right-click each icon and "Save image as..."</li>
+                <li>Save with the exact filename shown (e.g., icon-192x192.png)</li>
+                <li>Place all icons in the <code>static/icons/</code> folder</li>
+            </ol>
+        </div>
+
+        <button onclick="generateAllIcons()" style="font-size:16px; padding:12px 24px">
+            🎨 Generate All Icons
+        </button>
+
+        <div class="icons-grid" id="iconsGrid"></div>
+    </div>
+
+    <script>
+        function createIcon(size) {
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+
+            // Draw gradient background
+            const gradient = ctx.createLinearGradient(0, 0, 0, size);
+            gradient.addColorStop(0, '#1D4ED8');
+            gradient.addColorStop(0.5, '#4338CA');
+            gradient.addColorStop(1, '#7C3AED');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, size, size);
+
+            // Draw emoji/text
+            ctx.fillStyle = 'white';
+            ctx.font = `bold ${size * 0.5}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('📚', size / 2, size / 2);
+
+            // Add "SM" text if emoji doesn't render
+            ctx.font = `bold ${size * 0.3}px Arial`;
+            ctx.fillText('SM', size / 2, size * 0.7);
+
+            return canvas;
+        }
+
+        function generateAllIcons() {
+            const sizes = [72, 96, 128, 144, 152, 192, 384, 512];
+            const grid = document.getElementById('iconsGrid');
+            grid.innerHTML = '';
+
+            sizes.forEach(size => {
+                const canvas = createIcon(size);
+                
+                const item = document.createElement('div');
+                item.className = 'icon-item';
+                
+                const label = document.createElement('div');
+                label.textContent = `${size}x${size}`;
+                label.style.fontWeight = 'bold';
+                label.style.marginBottom = '10px';
+                
+                const downloadBtn = document.createElement('button');
+                downloadBtn.textContent = '💾 Download';
+                downloadBtn.onclick = () => {
+                    const link = document.createElement('a');
+                    link.download = `icon-${size}x${size}.png`;
+                    link.href = canvas.toDataURL();
+                    link.click();
+                };
+                
+                item.appendChild(label);
+                item.appendChild(canvas);
+                item.appendChild(downloadBtn);
+                grid.appendChild(item);
+            });
+
+            alert('✅ Icons generated! Right-click each icon to save, or use the Download buttons.');
+        }
+
+        // Auto-generate on load
+        window.onload = () => {
+            setTimeout(generateAllIcons, 500);
+        };
+    </script>
+</body>
+</html>

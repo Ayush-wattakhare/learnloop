@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Find Partners — LearnLoop{% endblock %}
+
+{% block content %}
+<div class="container">
+  <h3 style="font-weight:800; font-size:1.3rem; margin-bottom:20px">🔍 Find Study Partners</h3>
+
+  <!-- Filter Bar -->
+  <form method="GET" action="/find-partners">
+    <div class="filter-bar">
+      <div class="form-group">
+        <label class="form-label">Filter by Topic</label>
+        <input class="form-control" name="topic" placeholder="e.g. Python, DBMS, Machine Learning" value="{{ topic }}">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Filter by Language</label>
+        <input class="form-control" name="language" placeholder="e.g. English, Hindi, Spanish" value="{{ language }}">
+      </div>
+      <button type="submit" class="btn btn-primary" style="height:40px">Search</button>
+      <a href="/find-partners" class="btn btn-outline" style="height:40px">Reset</a>
+    </div>
+  </form>
+
+  <!-- Students Grid -->
+  <div class="grid-3">
+    {% if students %}
+      {% for student in students %}
+      <div class="student-card">
+        <div class="avatar avatar-lg" style="background:linear-gradient(135deg,{% if loop.index0 % 6 == 0 %}#EC4899,#8B5CF6{% elif loop.index0 % 6 == 1 %}#F59E0B,#EF4444{% elif loop.index0 % 6 == 2 %}#10B981,#3B82F6{% elif loop.index0 % 6 == 3 %}#6366F1,#EC4899{% elif loop.index0 % 6 == 4 %}#14B8A6,#6366F1{% else %}#F97316,#EF4444{% endif %})">
+          {{ student[1][0].upper() }}
+        </div>
+        <h5>{{ student[1] }}</h5>
+        <p class="college">{{ student[2] }}</p>
+        <span class="badge badge-blue" style="margin-bottom:10px">Semester {{ student[3] }}</span>
+        <p class="bio">{{ student[4] if student[4] else 'No bio available.' }}</p>
+        <div style="display:flex; gap:8px">
+          <a href="/view-profile/{{ student[0] }}" class="btn btn-outline btn-sm" style="flex:1">
+            👤 View Profile
+          </a>
+          <button class="btn btn-primary btn-sm" style="flex:1" onclick="sendFriendRequest({{ student[0] }})">
+            ➕ Add Friend
+          </button>
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div style="grid-column: 1/-1; text-align:center; padding:60px 20px">
+        <p style="font-size:3rem">🔍</p>
+        <h4 style="font-weight:700; margin-bottom:8px">No students found</h4>
+        <p class="text-muted">Try adjusting your filters or search criteria.</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+function sendFriendRequest(userId) {
+    fetch(`/send-friend-request/${userId}`, {
+        method: 'POST'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Friend request sent successfully!');
+            event.target.disabled = true;
+            event.target.textContent = '✓ Request Sent';
+        } else {
+            alert('Error: ' + (data.error || 'Failed to send request'));
+        }
+    })
+    .catch(error => {
+        alert('Error: ' + error);
+    });
+}
+</script>
+
+{% endblock %}

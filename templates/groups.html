@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Study Groups — LearnLoop{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px">
+    <div>
+      <h3 style="font-weight:800; font-size:1.3rem">📚 Study Groups</h3>
+      <p class="text-muted" style="margin:4px 0 0 0; font-size:0.85rem">
+        {% if show_all %}Showing all groups{% else %}Showing public groups only{% endif %}
+      </p>
+    </div>
+    <a href="/create-group" class="btn btn-primary">+ Create Group</a>
+  </div>
+
+  <!-- Filter Bar -->
+  <form method="GET" action="/groups">
+    <div class="filter-bar" style="margin-bottom:24px">
+      <div class="form-group">
+        <label class="form-label">Semester</label>
+        <select class="form-control" name="semester">
+          <option value="">All Semesters</option>
+          <option value="1" {% if semester == '1' %}selected{% endif %}>Semester 1</option>
+          <option value="2" {% if semester == '2' %}selected{% endif %}>Semester 2</option>
+          <option value="3" {% if semester == '3' %}selected{% endif %}>Semester 3</option>
+          <option value="4" {% if semester == '4' %}selected{% endif %}>Semester 4</option>
+          <option value="5" {% if semester == '5' %}selected{% endif %}>Semester 5</option>
+          <option value="6" {% if semester == '6' %}selected{% endif %}>Semester 6</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Subject</label>
+        <input class="form-control" name="subject" placeholder="e.g. Python, DBMS" value="{{ subject }}">
+      </div>
+      <button type="submit" class="btn btn-primary" style="height:40px">Filter</button>
+      <a href="/groups" class="btn btn-outline" style="height:40px">Reset</a>
+      {% if show_all %}
+        <a href="/groups" class="btn btn-outline" style="height:40px">Public Only</a>
+      {% else %}
+        <a href="/groups?show_all=true" class="btn btn-outline" style="height:40px">Show All</a>
+      {% endif %}
+    </div>
+  </form>
+
+  <!-- Groups Grid -->
+  <div class="grid-3">
+    {% if groups %}
+      {% for group in groups %}
+      <div class="group-card">
+        <div class="group-card-top" style="background:{% if loop.index0 % 6 == 0 %}#2563EB{% elif loop.index0 % 6 == 1 %}#16A34A{% elif loop.index0 % 6 == 2 %}#7C3AED{% elif loop.index0 % 6 == 3 %}#CA8A04{% elif loop.index0 % 6 == 4 %}#EC4899{% else %}#0EA5E9{% endif %}"></div>
+        <div class="group-card-body">
+          <div style="display:flex;gap:6px;margin-bottom:8px">
+            <span class="badge badge-blue">Sem {{ group[3] }}</span>
+            <span class="badge badge-gray">{{ group[7] }} members</span>
+          </div>
+          <h5>{{ group[1] }}</h5>
+          <p>{{ group[2] }} — {{ group[4] if group[4] else 'No description available.' }}</p>
+        </div>
+        <div class="group-card-footer">
+          <small>Created by {{ group[6] }}</small>
+          <a href="/group/{{ group[0] }}" class="btn btn-outline btn-sm">View →</a>
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div style="grid-column: 1/-1; text-align:center; padding:60px 20px">
+        <p style="font-size:3rem">📚</p>
+        <h4 style="font-weight:700; margin-bottom:8px">No groups found</h4>
+        <p class="text-muted">Be the first to <a href="/create-group" style="color:var(--blue)">create a study group</a>!</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

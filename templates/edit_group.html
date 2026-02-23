@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Group - LearnLoop{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 700px; margin: 40px auto;">
+    <div class="card">
+        <div class="card-header">
+            <h2>✏️ Edit Study Group</h2>
+            <p>Update your group information</p>
+        </div>
+        
+        <form method="POST" class="form-container">
+            <div class="form-group">
+                <label for="group_name">Group Name *</label>
+                <input type="text" id="group_name" name="group_name" value="{{ group[1] }}" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="subject">Subject *</label>
+                <input type="text" id="subject" name="subject" value="{{ group[2] }}" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="semester">Semester *</label>
+                <select id="semester" name="semester" required>
+                    <option value="">Select Semester</option>
+                    {% for sem in range(1, 9) %}
+                    <option value="{{ sem }}" {% if group[3]|int == sem %}selected{% endif %}>Semester {{ sem }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea id="description" name="description" rows="4" placeholder="What is this group about?">{{ group[4] if group[4] else '' }}</textarea>
+            </div>
+            
+            <div class="form-actions">
+                <a href="/group/{{ group[0] }}" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+            </div>
+        </form>
+        
+        <div class="danger-zone">
+            <h3>⚠️ Danger Zone</h3>
+            <p>Deleting this group will permanently remove all messages, notes, and members.</p>
+            <button class="btn btn-danger" onclick="deleteGroup()">Delete Group</button>
+        </div>
+    </div>
+</div>
+
+<style>
+.card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    overflow: hidden;
+}
+
+.card-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 32px;
+    text-align: center;
+}
+
+.card-header h2 {
+    margin: 0 0 8px 0;
+    font-size: 1.8rem;
+}
+
+.card-header p {
+    margin: 0;
+    opacity: 0.9;
+}
+
+.form-container {
+    padding: 32px;
+}
+
+.form-group {
+    margin-bottom: 24px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #374151;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #E5E7EB;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.2s;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #7C3AED;
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+}
+
+.form-group textarea {
+    resize: vertical;
+    font-family: inherit;
+}
+
+.form-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 32px;
+}
+
+.danger-zone {
+    border-top: 1px solid #E5E7EB;
+    padding: 32px;
+    background: #FEF2F2;
+}
+
+.danger-zone h3 {
+    color: #DC2626;
+    margin: 0 0 8px 0;
+    font-size: 1.2rem;
+}
+
+.danger-zone p {
+    color: #6B7280;
+    margin: 0 0 16px 0;
+}
+</style>
+
+<script>
+function deleteGroup() {
+    if (confirm('Are you sure you want to delete this group? This action cannot be undone!')) {
+        fetch('/delete-group/{{ group[0] }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.text().then(text => {
+                    throw new Error(`Server error: ${response.status} - ${text}`);
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                alert('Group deleted successfully!');
+                window.location.href = '/groups';
+            } else {
+                alert('Error: ' + (data.error || 'Failed to delete group'));
+            }
+        })
+        .catch(error => {
+            console.error('Delete error:', error);
+            alert('Error deleting group: ' + error.message);
+        });
+    }
+}
+</script>
+
+{% endblock %}

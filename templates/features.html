@@ -1,0 +1,535 @@
+{% extends "base.html" %}
+
+{% block title %}Features - LearnLoop Study Platform{% endblock %}
+
+{% block content %}
+<style>
+  .features-hero {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 80px 32px 60px;
+    text-align: center;
+  }
+  
+  .features-hero h1 {
+    font-size: 2.8rem;
+    font-weight: 800;
+    margin-bottom: 16px;
+  }
+  
+  .features-hero p {
+    font-size: 1.15rem;
+    opacity: 0.95;
+    max-width: 800px;
+    margin: 0 auto;
+    line-height: 1.7;
+  }
+  
+  .features-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 60px 32px;
+  }
+  
+  .feature-section {
+    margin-bottom: 80px;
+  }
+  
+  .feature-section:last-child {
+    margin-bottom: 40px;
+  }
+  
+  .feature-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  
+  .feature-icon-large {
+    font-size: 3.5rem;
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 16px;
+    flex-shrink: 0;
+  }
+  
+  .feature-title {
+    flex: 1;
+  }
+  
+  .feature-title h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+    color: #1F2937;
+  }
+  
+  .feature-title p {
+    font-size: 1.05rem;
+    color: #6B7280;
+    margin: 0;
+  }
+  
+  .feature-content {
+    background: white;
+    border: 1px solid #E5E7EB;
+    border-radius: 12px;
+    padding: 32px;
+    margin-top: 24px;
+  }
+  
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    margin-top: 24px;
+  }
+  
+  .feature-item {
+    padding: 20px;
+    background: #F9FAFB;
+    border-radius: 8px;
+    border-left: 4px solid #667eea;
+  }
+  
+  .feature-item h4 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0 0 8px 0;
+    color: #1F2937;
+  }
+  
+  .feature-item p {
+    font-size: 0.95rem;
+    color: #6B7280;
+    margin: 0;
+    line-height: 1.6;
+  }
+  
+  .feature-list {
+    list-style: none;
+    padding: 0;
+    margin: 16px 0 0 0;
+  }
+  
+  .feature-list li {
+    padding: 10px 0;
+    padding-left: 32px;
+    position: relative;
+    font-size: 0.95rem;
+    color: #4B5563;
+    line-height: 1.6;
+  }
+  
+  .feature-list li:before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: #10B981;
+    font-weight: 700;
+    font-size: 1.2rem;
+  }
+  
+  .tech-stack {
+    background: #F9FAFB;
+    padding: 60px 32px;
+    margin-top: 40px;
+  }
+  
+  .tech-stack-content {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .tech-stack h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 40px;
+    color: #1F2937;
+  }
+  
+  .tech-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 24px;
+  }
+  
+  .tech-card {
+    background: white;
+    padding: 24px;
+    border-radius: 12px;
+    border: 1px solid #E5E7EB;
+    text-align: center;
+  }
+  
+  .tech-card h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 16px 0 12px 0;
+    color: #1F2937;
+  }
+  
+  .tech-card p {
+    font-size: 0.9rem;
+    color: #6B7280;
+    margin: 0;
+  }
+  
+  .cta-section {
+    background: white;
+    padding: 80px 32px;
+    text-align: center;
+  }
+  
+  .cta-section h2 {
+    font-size: 2.2rem;
+    font-weight: 800;
+    margin-bottom: 16px;
+    color: #1F2937;
+  }
+  
+  .cta-section p {
+    font-size: 1.1rem;
+    color: #6B7280;
+    margin-bottom: 32px;
+  }
+  
+  .btn-large {
+    padding: 16px 32px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: inline-block;
+    background: #667eea;
+    color: white;
+    border: none;
+  }
+  
+  .btn-large:hover {
+    background: #5568d3;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(102, 126, 234, 0.3);
+  }
+</style>
+
+<!-- Hero Section -->
+<div class="features-hero">
+  <h1>🚀 Powerful Features for Better Learning</h1>
+  <p>LearnLoop brings together everything you need for collaborative studying in one comprehensive platform. From finding study partners to hosting live sessions, we've got you covered.</p>
+</div>
+
+<!-- Features Container -->
+<div class="features-container">
+  
+  <!-- Feature 1: User System -->
+  <div class="feature-section">
+    <div class="feature-header">
+      <div class="feature-icon-large">👤</div>
+      <div class="feature-title">
+        <h2>User Profiles & Authentication</h2>
+        <p>Secure accounts with personalized profiles</p>
+      </div>
+    </div>
+    <div class="feature-content">
+      <p>Create your personalized learning profile with secure authentication. Manage your account, customize your profile, and connect with other students.</p>
+      <div class="feature-grid">
+        <div class="feature-item">
+          <h4>🔐 Secure Registration</h4>
+          <p>Password hashing with PBKDF2-SHA256, email validation, and rate limiting protection</p>
+        </div>
+        <div class="feature-item">
+          <h4>📸 Profile Pictures</h4>
+          <p>Upload custom profile pictures to personalize your account</p>
+        </div>
+        <div class="feature-item">
+          <h4>✏️ Editable Profiles</h4>
+          <p>Update your bio, semester, college, and study interests anytime</p>
+        </div>
+        <div class="feature-item">
+          <h4>🔒 Session Security</h4>
+          <p>Secure cookies, 24-hour inactivity expiry, and HTTPS enforcement</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feature 2: Find Study Partners -->
+  <div class="feature-section">
+    <div class="feature-header">
+      <div class="feature-icon-large">🔍</div>
+      <div class="feature-title">
+        <h2>Find Study Partners</h2>
+        <p>Connect with classmates who share your interests</p>
+      </div>
+    </div>
+    <div class="feature-content">
+      <p>Discover study partners based on topics, languages, and academic interests. View detailed profiles and send friend requests to build your study network.</p>
+      <ul class="feature-list">
+        <li>Search by topic - Find students studying specific subjects</li>
+        <li>Filter by language - Connect with students who speak your language</li>
+        <li>View detailed profiles - See bio, semester, college, and study interests</li>
+        <li>Smart suggestions - Get personalized partner recommendations</li>
+        <li>Friend requests - Send and accept connection requests</li>
+        <li>Profile viewing - Browse other students' profiles and groups</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Feature 3: Messaging System -->
+  <div class="feature-section">
+    <div class="feature-header">
+      <div class="feature-icon-large">💬</div>
+      <div class="feature-title">
+        <h2>Real-Time Messaging</h2>
+        <p>Chat with friends and share files instantly</p>
+      </div>
+    </div>
+    <div class="feature-content">
+      <p>Stay connected with your study partners through one-on-one messaging. Share files, track conversations, and never miss an important message.</p>
+      <div class="feature-grid">
+        <div class="feature-item">
+          <h4>💬 Direct Messages</h4>
+          <p>One-on-one chat with accepted friends in real-time</p>
+        </div>
+        <div class="feature-item">
+          <h4>📎 File Sharing</h4>
+          <p>Share PDFs, images, documents, and study materials</p>
+        </div>
+        <div class="feature-item">
+          <h4>🔔 Unread Tracking</h4>
+          <p>See unread message counts and never miss important updates</p>
+        </div>
+        <div class="feature-item">
+          <h4>⚡ Real-Time Updates</h4>
+          <p>Socket.IO powered instant message delivery</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feature 4: Study Groups -->
+  <div class="feature-section">
+    <div class="feature-header">
+      <div class="feature-icon-large">📚</div>
+      <div class="feature-title">
+        <h2>Study Groups</h2>
+        <p>Create and join collaborative study spaces</p>
+      </div>
+    </div>
+    <div class="feature-content">
+      <p>Form study groups for your subjects with powerful collaboration tools. Share notes, discuss topics, and manage members all in one place.</p>
+      <ul class="feature-list">
+        <li>Public & Private Groups - Control who can join your study group</li>
+        <li>Group Chat - Real-time discussions with all members</li>
+        <li>Notes Sharing - Upload and download PDFs, documents, and study materials</li>
+        <li>Member Management - View all group members and their details</li>
+        <li>Group Editing - Update group name, subject, and description</li>
+        <li>Group Deletion - Remove groups you created (with cascade deletion)</li>
+        <li>Shareable Links - Share group links with anyone</li>
+        <li>Smart Notifications - Notify relevant students when groups are created</li>
+        <li>Search & Filter - Find groups by semester and subject</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Feature 5: Voice & Video Rooms -->
+  <div class="feature-section">
+    <div class="feature-header">
+      <div class="feature-icon-large">🎥</div>
+      <div class="feature-title">
+        <h2>Voice & Video Rooms</h2>
+        <p>Host live study sessions with interactive tools</p>
+      </div>
+    </div>
+    <div class="feature-content">
+      <p>Conduct live study sessions with video, audio, and collaborative whiteboard. Perfect for group discussions, doubt clearing, and interactive learning.</p>
+      <div class="feature-grid">
+        <div class="feature-item">
+          <h4>🎥 Video & Audio</h4>
+          <p>WebRTC-powered video and audio rooms with toggle controls</p>
+        </div>
+        <div class="feature-item">
+          <h4>🎨 Interactive Whiteboard</h4>
+          <p>Draw, write text, and collaborate visually in real-time</p>
+        </div>
+        <div class="feature-item">
+          <h4>👑 Host Controls</h4>
+          <p>Start/end sessions, approve stage requests, manage participants</p>
+        </div>
+        <div class="feature-item">
+          <h4>🎭 Stage Management</h4>
+          <p>Host, stage, and audience roles with request system</p>
+        </div>
+        <div class="feature-item">
+          <h4>💬 Room Chat</h4>
+          <p>Text chat alongside video for questions and discussions</p>
+        </div>
+        <div class="feature-item">
+          <h4>🔗 Shareable Links</h4>
+          <p>Unique room codes for easy sharing and joining</p>
+        </div>
+        <div class="feature-item">
+          <h4>🔒 Public & Private</h4>
+          <p>Control room visibility and access</p>
+        </div>
+        <div class="feature-item">
+          <h4>📊 Host Status</h4>
+          <p>Real-time host online/offline status tracking</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feature 6: Notifications -->
+  <div class="feature-section">
+    <div class="feature-header">
+      <div class="feature-icon-large">🔔</div>
+      <div class="feature-title">
+        <h2>Smart Notifications</h2>
+        <p>Stay updated with real-time alerts</p>
+      </div>
+    </div>
+    <div class="feature-content">
+      <p>Never miss important updates with our comprehensive notification system. Get alerts for new groups, friend requests, messages, and more.</p>
+      <ul class="feature-list">
+        <li>New Group Alerts - Get notified when groups matching your interests are created</li>
+        <li>Friend Requests - Instant notifications for new connection requests</li>
+        <li>Message Notifications - Unread message counts and alerts</li>
+        <li>Real-Time Updates - Socket.IO powered instant notifications</li>
+        <li>Notification Center - View all notifications in one place</li>
+        <li>Read/Unread Tracking - Mark notifications as read automatically</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Feature 7: File Management -->
+  <div class="feature-section">
+    <div class="feature-header">
+      <div class="feature-icon-large">📁</div>
+      <div class="feature-title">
+        <h2>File Sharing & Management</h2>
+        <p>Secure file uploads and downloads</p>
+      </div>
+    </div>
+    <div class="feature-content">
+      <p>Share study materials, notes, and resources with your groups and friends. Secure file handling with type validation and size limits.</p>
+      <div class="feature-grid">
+        <div class="feature-item">
+          <h4>📄 Multiple Formats</h4>
+          <p>Support for PDF, images, DOCX, PPTX, and more</p>
+        </div>
+        <div class="feature-item">
+          <h4>🔒 Secure Uploads</h4>
+          <p>File type validation, sanitization, and 16MB size limit</p>
+        </div>
+        <div class="feature-item">
+          <h4>📦 Organized Storage</h4>
+          <p>Files organized by groups, messages, and profiles</p>
+        </div>
+        <div class="feature-item">
+          <h4>⬇️ Easy Downloads</h4>
+          <p>One-click download for all shared files</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feature 8: Security -->
+  <div class="feature-section">
+    <div class="feature-header">
+      <div class="feature-icon-large">🛡️</div>
+      <div class="feature-title">
+        <h2>Comprehensive Security</h2>
+        <p>Enterprise-grade security features</p>
+      </div>
+    </div>
+    <div class="feature-content">
+      <p>Your data and privacy are our top priority. LearnLoop implements multiple layers of security to protect your information.</p>
+      <ul class="feature-list">
+        <li>Password Security - PBKDF2-SHA256 hashing with minimum 8 characters, letters, and numbers</li>
+        <li>HTTP Security Headers - X-Frame-Options, X-Content-Type-Options, CSP, HSTS</li>
+        <li>Session Security - Secure cookies, HttpOnly, SameSite, 7-day lifetime, 24-hour inactivity expiry</li>
+        <li>Rate Limiting - 5 login attempts per 15 min, 3 registrations per hour</li>
+        <li>Input Validation - Email validation, HTML tag removal, SQL injection prevention</li>
+        <li>File Upload Security - Type whitelist, size limits, filename sanitization</li>
+        <li>HTTPS Enforcement - Strict-Transport-Security in production</li>
+        <li>XSS Protection - Content Security Policy and input sanitization</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Feature 9: Demo Mode -->
+  <div class="feature-section">
+    <div class="feature-header">
+      <div class="feature-icon-large">🎭</div>
+      <div class="feature-title">
+        <h2>Demo Mode</h2>
+        <p>Try before you commit</p>
+      </div>
+    </div>
+    <div class="feature-content">
+      <p>Explore all features without creating an account. Demo mode lets you experience the platform with sample data.</p>
+      <div class="feature-grid">
+        <div class="feature-item">
+          <h4>🎯 Full Feature Access</h4>
+          <p>Explore dashboard, groups, messages, and voice rooms</p>
+        </div>
+        <div class="feature-item">
+          <h4>📊 Sample Data</h4>
+          <p>Pre-populated groups, students, and conversations</p>
+        </div>
+        <div class="feature-item">
+          <h4>🚀 No Database Required</h4>
+          <p>Works without MySQL setup for quick testing</p>
+        </div>
+        <div class="feature-item">
+          <h4>🔄 Easy Exit</h4>
+          <p>Exit demo mode anytime to create a real account</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Tech Stack Section -->
+<div class="tech-stack">
+  <div class="tech-stack-content">
+    <h2>🛠️ Built with Modern Technology</h2>
+    <div class="tech-grid">
+      <div class="tech-card">
+        <h3>Flask</h3>
+        <p>Python web framework for robust backend</p>
+      </div>
+      <div class="tech-card">
+        <h3>Socket.IO</h3>
+        <p>Real-time bidirectional communication</p>
+      </div>
+      <div class="tech-card">
+        <h3>MySQL</h3>
+        <p>Reliable relational database</p>
+      </div>
+      <div class="tech-card">
+        <h3>WebRTC</h3>
+        <p>Peer-to-peer video and audio</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CTA Section -->
+<div class="cta-section">
+  <h2>Ready to Start Learning Together?</h2>
+  <p>Join LearnLoop today and experience the power of collaborative learning.</p>
+  <a href="/register" class="btn-large">Get Started Free →</a>
+</div>
+
+{% endblock %}

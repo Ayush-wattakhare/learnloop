@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LearnLoop — Find Your Perfect Study Partner 🎓</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <!-- Navbar -->
+  <div class="navbar">
+    <a href="/" class="navbar-brand"><span>📚</span> LearnLoop</a>
+    <div class="navbar-links">
+      <a href="/" class="nav-link active">Home</a>
+      <a href="/features" class="nav-link">Features</a>
+      <a href="/about" class="nav-link">About</a>
+      <a href="/login" class="nav-link">Login</a>
+      <a href="/register"><button class="nav-badge">Get Started →</button></a>
+    </div>
+  </div>
+
+  <!-- Hero Section -->
+  <div class="hero">
+    <h1>Find Your Perfect<br/><em>Study Partner</em> 🎓</h1>
+    <p>Connect with classmates, share notes, and study smarter together.</p>
+    <div class="hero-btns">
+      {% if db_available %}
+        <a href="/register"><button class="btn-hero-primary">Get Started Free</button></a>
+        <a href="/demo"><button class="btn-hero-outline">View Demo</button></a>
+      {% else %}
+        <a href="/demo"><button class="btn-hero-primary">🎭 Try Demo Mode</button></a>
+        <button class="btn-hero-outline" onclick="alert('Database not configured.\n\nTo enable full features:\n1. Install XAMPP\n2. Start MySQL\n3. Create database: learnloop\n4. Import database.sql\n\nFor now, enjoy Demo Mode!')">Setup Database</button>
+      {% endif %}
+    </div>
+    {% if not db_available %}
+    <div style="margin-top:20px; background:rgba(252,211,77,0.2); padding:12px 20px; border-radius:10px; max-width:600px; margin-left:auto; margin-right:auto">
+      <p style="margin:0; font-size:0.85rem; color:#FCD34D">
+        ⚠️ Database not configured - Demo Mode available
+      </p>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Features Section -->
+  <div class="features" id="features">
+    <div class="feature-card">
+      <div class="feature-icon" style="background:#EFF6FF">👥</div>
+      <h4>Find Study Partners</h4>
+      <p>Filter by semester and college to find the right study buddy for any subject instantly.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background:#F0FDF4">📁</div>
+      <h4>Share Notes</h4>
+      <p>Upload and download PDF notes, assignments, and study material inside groups easily.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background:#FEFCE8">💬</div>
+      <h4>Group Discussions</h4>
+      <p>Chat with your group members, discuss doubts, and plan study sessions together.</p>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

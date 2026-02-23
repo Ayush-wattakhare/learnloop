@@ -1,0 +1,489 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Voice Room - LearnLoop{% endblock %}
+
+{% block content %}
+<div class="edit-room-container">
+    <div class="edit-room-header">
+        <div class="header-icon">✏️</div>
+        <h1>Edit Voice Room</h1>
+        <p>Update your voice room settings</p>
+    </div>
+    
+    <div class="edit-room-layout">
+        <!-- Left Side - Form -->
+        <div class="edit-room-card">
+            <form method="POST" action="/edit-voice-room/{{ room_code }}">
+                <div class="form-section">
+                    <h3>📝 Room Details</h3>
+                    
+                    <div class="form-group">
+                        <label for="room_name">
+                            Room Name <span class="required">*</span>
+                        </label>
+                        <input type="text" id="room_name" name="room_name" 
+                               value="{{ room[1] }}" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="subject">
+                            Subject <span class="required">*</span>
+                        </label>
+                        <input type="text" id="subject" name="subject" 
+                               value="{{ room[2] }}" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <textarea id="description" name="description" rows="3">{{ room[3] }}</textarea>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>⚙️ Room Settings</h3>
+                    
+                    <div class="form-group">
+                        <label for="room_type">
+                            Room Type <span class="required">*</span>
+                        </label>
+                        <div class="radio-group">
+                            <label class="radio-card">
+                                <input type="radio" name="room_type" value="video" {% if room[7] == 'video' %}checked{% endif %}>
+                                <div class="radio-content">
+                                    <div class="radio-icon">🎥</div>
+                                    <div class="radio-text">
+                                        <div class="radio-title">Video Room</div>
+                                        <div class="radio-desc">Video + Audio</div>
+                                    </div>
+                                </div>
+                            </label>
+                            
+                            <label class="radio-card">
+                                <input type="radio" name="room_type" value="audio" {% if room[7] == 'audio' %}checked{% endif %}>
+                                <div class="radio-content">
+                                    <div class="radio-icon">🎤</div>
+                                    <div class="radio-text">
+                                        <div class="radio-title">Audio Only</div>
+                                        <div class="radio-desc">Voice Chat</div>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="is_public" value="true" {% if room[6] %}checked{% endif %}>
+                            <span class="checkbox-text">
+                                <span class="checkbox-title">Make this room publicly visible</span>
+                                <span class="checkbox-desc">Anyone can discover and join your room</span>
+                            </span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <a href="/voice-room/{{ room_code }}" class="btn btn-secondary">
+                        <span>←</span> Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <span>💾</span> Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Right Side - Info & Danger Zone -->
+        <div class="sidebar">
+            <div class="info-card">
+                <h3>ℹ️ Room Information</h3>
+                <div class="info-item">
+                    <span class="info-label">Room Code:</span>
+                    <span class="info-value">{{ room_code }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Created:</span>
+                    <span class="info-value">{{ room[11].strftime('%b %d, %Y') if room[11] else 'N/A' }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Status:</span>
+                    <span class="info-value">
+                        {% if room[8] %}
+                        <span class="status-badge active">🔴 Live</span>
+                        {% else %}
+                        <span class="status-badge ended">⚫ Ended</span>
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+            
+            <div class="danger-card">
+                <div class="danger-header">
+                    <div class="danger-icon">⚠️</div>
+                    <h3>Danger Zone</h3>
+                </div>
+                <p class="danger-description">
+                    Deleting this room will permanently remove all messages, participants, and whiteboard data. This action cannot be undone.
+                </p>
+                <button class="btn btn-danger btn-block" onclick="confirmDelete()">
+                    <span>🗑️</span> Delete Room Permanently
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.edit-room-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+.edit-room-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.header-icon {
+    font-size: 4rem;
+    margin-bottom: 16px;
+}
+
+.edit-room-header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 8px;
+    color: #111827;
+    font-weight: 700;
+}
+
+.edit-room-header p {
+    color: #6B7280;
+    font-size: 1.1rem;
+}
+
+.edit-room-layout {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 32px;
+    align-items: start;
+}
+
+@media (max-width: 968px) {
+    .edit-room-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+.edit-room-card {
+    background: white;
+    border-radius: 16px;
+    padding: 32px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+}
+
+.form-section {
+    margin-bottom: 32px;
+    padding-bottom: 32px;
+    border-bottom: 2px solid #F3F4F6;
+}
+
+.form-section:last-of-type {
+    border-bottom: none;
+    margin-bottom: 24px;
+}
+
+.form-section h3 {
+    font-size: 1.25rem;
+    margin-bottom: 20px;
+    color: #111827;
+    font-weight: 600;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #374151;
+    font-size: 0.95rem;
+}
+
+.required {
+    color: #DC2626;
+}
+
+.form-group input[type="text"],
+.form-group textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #E5E7EB;
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: all 0.2s;
+    font-family: inherit;
+}
+
+.form-group input[type="text"]:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #7C3AED;
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+/* Radio Group Styles */
+.radio-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.radio-card {
+    position: relative;
+    cursor: pointer;
+}
+
+.radio-card input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+}
+
+.radio-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    border: 2px solid #E5E7EB;
+    border-radius: 12px;
+    transition: all 0.2s;
+    background: white;
+}
+
+.radio-card input[type="radio"]:checked + .radio-content {
+    border-color: #7C3AED;
+    background: #F5F3FF;
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+}
+
+.radio-icon {
+    font-size: 2rem;
+}
+
+.radio-text {
+    flex: 1;
+}
+
+.radio-title {
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 2px;
+}
+
+.radio-desc {
+    font-size: 0.85rem;
+    color: #6B7280;
+}
+
+/* Checkbox Styles */
+.checkbox-label {
+    display: flex;
+    align-items: start;
+    gap: 12px;
+    cursor: pointer;
+    padding: 16px;
+    border: 2px solid #E5E7EB;
+    border-radius: 12px;
+    transition: all 0.2s;
+}
+
+.checkbox-label:hover {
+    border-color: #D1D5DB;
+    background: #F9FAFB;
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    margin: 0;
+    cursor: pointer;
+    accent-color: #7C3AED;
+}
+
+.checkbox-text {
+    flex: 1;
+}
+
+.checkbox-title {
+    display: block;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 4px;
+}
+
+.checkbox-desc {
+    display: block;
+    font-size: 0.85rem;
+    color: #6B7280;
+}
+
+/* Form Actions */
+.form-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 32px;
+}
+
+.form-actions .btn {
+    flex: 1;
+    padding: 14px 24px;
+    font-size: 1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+/* Sidebar */
+.sidebar {
+    position: sticky;
+    top: 20px;
+}
+
+.info-card {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+}
+
+.info-card h3 {
+    font-size: 1.25rem;
+    margin-bottom: 20px;
+    color: #111827;
+    font-weight: 600;
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #F3F4F6;
+}
+
+.info-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.info-label {
+    font-weight: 600;
+    color: #6B7280;
+    font-size: 0.9rem;
+}
+
+.info-value {
+    color: #111827;
+    font-weight: 500;
+}
+
+.status-badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.status-badge.active {
+    background: #FEE2E2;
+    color: #DC2626;
+}
+
+.status-badge.ended {
+    background: #F3F4F6;
+    color: #6B7280;
+}
+
+/* Danger Card */
+.danger-card {
+    background: linear-gradient(135deg, #FEE2E2 0%, #FEF2F2 100%);
+    border: 2px solid #FCA5A5;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 4px 24px rgba(220, 38, 38, 0.15);
+}
+
+.danger-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.danger-icon {
+    font-size: 2rem;
+}
+
+.danger-header h3 {
+    font-size: 1.25rem;
+    color: #DC2626;
+    font-weight: 700;
+    margin: 0;
+}
+
+.danger-description {
+    color: #991B1B;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+.btn-danger {
+    background: #DC2626;
+    color: white;
+    border: none;
+}
+
+.btn-danger:hover {
+    background: #B91C1C;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+</style>
+
+<script>
+function confirmDelete() {
+    if (confirm('⚠️ Are you absolutely sure?\n\nThis will permanently delete:\n• All room messages\n• All participants data\n• All whiteboard content\n• Room settings\n\nThis action CANNOT be undone!')) {
+        fetch('/delete-voice-room/{{ room_code }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('✅ Voice room deleted successfully!');
+                window.location.href = '/voice-rooms';
+            } else {
+                alert('❌ Error: ' + (data.error || 'Failed to delete room'));
+            }
+        })
+        .catch(error => {
+            alert('❌ Error deleting room: ' + error);
+        });
+    }
+}
+</script>
+{% endblock %}

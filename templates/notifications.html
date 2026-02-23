@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block title %}Notifications - LearnLoop{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 800px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px">
+        <h3 style="font-weight:800; font-size:1.3rem">🔔 Notifications</h3>
+    </div>
+
+    <div class="card">
+        <div class="card-body" style="padding:0">
+            {% if notifications %}
+                {% for notif in notifications %}
+                <div class="notification-item {% if not notif[5] %}unread{% endif %}">
+                    <div class="notification-icon">
+                        {% if notif[1] == 'group_created' %}
+                            📚
+                        {% elif notif[1] == 'friend_request' %}
+                            👥
+                        {% elif notif[1] == 'message' %}
+                            💬
+                        {% else %}
+                            🔔
+                        {% endif %}
+                    </div>
+                    <div class="notification-content">
+                        <div class="notification-title">{{ notif[2] }}</div>
+                        <div class="notification-message">{{ notif[3] }}</div>
+                        <div class="notification-time">{{ notif[6].strftime('%b %d, %Y at %I:%M %p') }}</div>
+                    </div>
+                    {% if notif[4] %}
+                        <a href="{{ notif[4] }}" class="notification-action">
+                            View →
+                        </a>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            {% else %}
+                <div style="text-align:center; padding:60px 20px">
+                    <p style="font-size:3rem">🔔</p>
+                    <h4 style="font-weight:700; margin-bottom:8px">No Notifications</h4>
+                    <p class="text-muted">You're all caught up!</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.notification-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px;
+    border-bottom: 1px solid #E5E7EB;
+    transition: background 0.2s;
+}
+
+.notification-item:last-child {
+    border-bottom: none;
+}
+
+.notification-item:hover {
+    background: #F9FAFB;
+}
+
+.notification-item.unread {
+    background: #EFF6FF;
+}
+
+.notification-item.unread:hover {
+    background: #DBEAFE;
+}
+
+.notification-icon {
+    font-size: 2rem;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #F3F4F6;
+    border-radius: 50%;
+}
+
+.notification-item.unread .notification-icon {
+    background: #DBEAFE;
+}
+
+.notification-content {
+    flex: 1;
+}
+
+.notification-title {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: #111827;
+    margin-bottom: 4px;
+}
+
+.notification-message {
+    font-size: 0.85rem;
+    color: #6B7280;
+    line-height: 1.5;
+    margin-bottom: 4px;
+}
+
+.notification-time {
+    font-size: 0.75rem;
+    color: #9CA3AF;
+}
+
+.notification-action {
+    padding: 8px 16px;
+    background: #2563EB;
+    color: white;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.notification-action:hover {
+    background: #1D4ED8;
+    transform: translateX(2px);
+}
+</style>
+
+{% endblock %}

@@ -1,0 +1,400 @@
+{% extends "base.html" %}
+
+{% block title %}About LearnLoop - Study Collaboration Platform{% endblock %}
+
+{% block content %}
+<style>
+  .about-hero {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 80px 32px 60px;
+    text-align: center;
+  }
+  
+  .about-hero h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 16px;
+  }
+  
+  .about-hero p {
+    font-size: 1.1rem;
+    opacity: 0.95;
+    max-width: 700px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+  
+  .about-section {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 60px 32px;
+  }
+  
+  .about-section h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: #1F2937;
+  }
+  
+  .about-section p {
+    font-size: 1.05rem;
+    line-height: 1.8;
+    color: #4B5563;
+    margin-bottom: 24px;
+  }
+  
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 32px;
+    margin-top: 40px;
+  }
+  
+  .feature-card {
+    background: white;
+    border: 1px solid #E5E7EB;
+    border-radius: 12px;
+    padding: 32px;
+    transition: all 0.3s ease;
+  }
+  
+  .feature-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+    border-color: #667eea;
+  }
+  
+  .feature-icon {
+    font-size: 3rem;
+    margin-bottom: 16px;
+    display: block;
+  }
+  
+  .feature-card h3 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #1F2937;
+  }
+  
+  .feature-card p {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: #6B7280;
+    margin-bottom: 0;
+  }
+  
+  .feature-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 12px;
+  }
+  
+  .feature-list li {
+    padding: 8px 0;
+    padding-left: 28px;
+    position: relative;
+    font-size: 0.9rem;
+    color: #4B5563;
+  }
+  
+  .feature-list li:before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: #10B981;
+    font-weight: 700;
+  }
+  
+  .stats-section {
+    background: #F9FAFB;
+    padding: 60px 32px;
+    text-align: center;
+  }
+  
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 40px;
+    max-width: 1000px;
+    margin: 40px auto 0;
+  }
+  
+  .stat-card {
+    padding: 24px;
+  }
+  
+  .stat-number {
+    font-size: 3rem;
+    font-weight: 800;
+    color: #667eea;
+    display: block;
+    margin-bottom: 8px;
+  }
+  
+  .stat-label {
+    font-size: 1rem;
+    color: #6B7280;
+    font-weight: 600;
+  }
+  
+  .mission-section {
+    background: white;
+    padding: 60px 32px;
+  }
+  
+  .mission-content {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  
+  .mission-box {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 40px;
+    border-radius: 16px;
+    margin-top: 32px;
+  }
+  
+  .mission-box h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+  
+  .mission-box p {
+    font-size: 1.05rem;
+    line-height: 1.8;
+    opacity: 0.95;
+    margin-bottom: 0;
+    color: white;
+  }
+  
+  .cta-section {
+    background: #F9FAFB;
+    padding: 80px 32px;
+    text-align: center;
+  }
+  
+  .cta-section h2 {
+    font-size: 2.2rem;
+    font-weight: 800;
+    margin-bottom: 16px;
+    color: #1F2937;
+  }
+  
+  .cta-section p {
+    font-size: 1.1rem;
+    color: #6B7280;
+    margin-bottom: 32px;
+  }
+  
+  .cta-buttons {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .btn-large {
+    padding: 16px 32px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: inline-block;
+  }
+  
+  .btn-primary-large {
+    background: #667eea;
+    color: white;
+    border: none;
+  }
+  
+  .btn-primary-large:hover {
+    background: #5568d3;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(102, 126, 234, 0.3);
+  }
+  
+  .btn-secondary-large {
+    background: white;
+    color: #667eea;
+    border: 2px solid #667eea;
+  }
+  
+  .btn-secondary-large:hover {
+    background: #667eea;
+    color: white;
+    transform: translateY(-2px);
+  }
+</style>
+
+<!-- Hero Section -->
+<div class="about-hero">
+  <h1>About LearnLoop 📚</h1>
+  <p>A modern study collaboration platform designed to help students connect, learn together, and achieve academic success through peer-to-peer learning.</p>
+</div>
+
+<!-- Mission Section -->
+<div class="mission-section">
+  <div class="mission-content">
+    <h2>Our Mission</h2>
+    <p>LearnLoop was created to solve a common problem faced by students everywhere: finding the right study partners and collaborating effectively. We believe that learning is better together, and our platform makes it easy to connect with classmates, share knowledge, and support each other's academic journey.</p>
+    
+    <div class="mission-box">
+      <h3>🎯 Why LearnLoop?</h3>
+      <p>Traditional study methods often leave students feeling isolated. LearnLoop brings students together in a digital space where they can form study groups, share resources, communicate in real-time, and even conduct live study sessions with video and audio capabilities. We're not just a platform—we're a community of learners helping each other succeed.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Features Section -->
+<div class="about-section">
+  <h2>✨ Powerful Features</h2>
+  <p>LearnLoop is packed with features designed to enhance your study experience and make collaboration effortless.</p>
+  
+  <div class="features-grid">
+    <!-- Feature 1 -->
+    <div class="feature-card">
+      <span class="feature-icon">👥</span>
+      <h3>Find Study Partners</h3>
+      <p>Connect with classmates who share your interests and study goals.</p>
+      <ul class="feature-list">
+        <li>Search by topic and language</li>
+        <li>View detailed profiles</li>
+        <li>Send friend requests</li>
+        <li>Get personalized suggestions</li>
+      </ul>
+    </div>
+    
+    <!-- Feature 2 -->
+    <div class="feature-card">
+      <span class="feature-icon">💬</span>
+      <h3>Real-Time Messaging</h3>
+      <p>Stay connected with your study partners through instant messaging.</p>
+      <ul class="feature-list">
+        <li>One-on-one chat</li>
+        <li>File sharing (PDFs, images, docs)</li>
+        <li>Unread message notifications</li>
+        <li>Voice call interface (coming soon)</li>
+      </ul>
+    </div>
+    
+    <!-- Feature 3 -->
+    <div class="feature-card">
+      <span class="feature-icon">📚</span>
+      <h3>Study Groups</h3>
+      <p>Create or join study groups for your subjects and collaborate with peers.</p>
+      <ul class="feature-list">
+        <li>Public and private groups</li>
+        <li>Group chat and discussions</li>
+        <li>Share notes and resources</li>
+        <li>Member management</li>
+      </ul>
+    </div>
+    
+    <!-- Feature 4 -->
+    <div class="feature-card">
+      <span class="feature-icon">🎥</span>
+      <h3>Voice & Video Rooms</h3>
+      <p>Host live study sessions with video, audio, and interactive whiteboard.</p>
+      <ul class="feature-list">
+        <li>Video and audio rooms</li>
+        <li>Interactive whiteboard</li>
+        <li>Drawing and text tools</li>
+        <li>Host controls</li>
+      </ul>
+    </div>
+    
+    <!-- Feature 5 -->
+    <div class="feature-card">
+      <span class="feature-icon">🔔</span>
+      <h3>Smart Notifications</h3>
+      <p>Stay updated with real-time notifications for all activities.</p>
+      <ul class="feature-list">
+        <li>New group alerts</li>
+        <li>Friend request notifications</li>
+        <li>Message notifications</li>
+        <li>Real-time updates</li>
+      </ul>
+    </div>
+    
+    <!-- Feature 6 -->
+    <div class="feature-card">
+      <span class="feature-icon">📁</span>
+      <h3>File Sharing</h3>
+      <p>Share study materials, notes, and resources with your groups.</p>
+      <ul class="feature-list">
+        <li>Upload PDFs, images, documents</li>
+        <li>Organize by group</li>
+        <li>Easy download and access</li>
+        <li>Secure file storage</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- Stats Section -->
+<div class="stats-section">
+  <h2>LearnLoop by the Numbers</h2>
+  <div class="stats-grid">
+    <div class="stat-card">
+      <span class="stat-number">20+</span>
+      <span class="stat-label">Features</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-number">100%</span>
+      <span class="stat-label">Free to Use</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-number">24/7</span>
+      <span class="stat-label">Available</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-number">∞</span>
+      <span class="stat-label">Possibilities</span>
+    </div>
+  </div>
+</div>
+
+<!-- How It Works Section -->
+<div class="about-section" style="background: white;">
+  <h2>🚀 How It Works</h2>
+  <p>Getting started with LearnLoop is simple and takes just a few minutes.</p>
+  
+  <div class="features-grid">
+    <div class="feature-card">
+      <span class="feature-icon">1️⃣</span>
+      <h3>Create Your Account</h3>
+      <p>Sign up with your email and create your profile. Tell us about your interests and study preferences.</p>
+    </div>
+    
+    <div class="feature-card">
+      <span class="feature-icon">2️⃣</span>
+      <h3>Find Your Community</h3>
+      <p>Search for study partners, join existing groups, or create your own study groups for your subjects.</p>
+    </div>
+    
+    <div class="feature-card">
+      <span class="feature-icon">3️⃣</span>
+      <h3>Start Collaborating</h3>
+      <p>Chat with your study partners, share resources, host live study sessions, and achieve your academic goals together.</p>
+    </div>
+  </div>
+</div>
+
+<!-- CTA Section -->
+<div class="cta-section">
+  <h2>Ready to Transform Your Study Experience?</h2>
+  <p>Join LearnLoop today and discover the power of collaborative learning.</p>
+  <div class="cta-buttons">
+    <a href="/register" class="btn-large btn-primary-large">Get Started Free →</a>
+    <a href="/" class="btn-large btn-secondary-large">← Back to Home</a>
+  </div>
+</div>
+
+{% endblock %}

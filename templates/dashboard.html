@@ -1,0 +1,757 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard — LearnLoop{% endblock %}
+
+{% block content %}
+<div class="page-container">
+  {% if session.demo_mode %}
+  <div class="demo-banner">
+    <div class="demo-icon">🎭</div>
+    <div class="demo-content">
+      <strong>You're in Demo Mode!</strong>
+      <span>Explore all features. <a href="/register">Sign up</a> to save your data.</span>
+    </div>
+  </div>
+  {% endif %}
+  
+  <!-- Enhanced Hero Header -->
+  <div class="hero-header-dashboard">
+    <div class="hero-content-dashboard">
+      <div class="welcome-section">
+        <div class="icon-badge-dashboard">👋</div>
+        <div>
+          <h1 class="page-title-dashboard">Welcome back, {{ session.user_name }}!</h1>
+          <p class="page-subtitle-dashboard">Semester {{ session.semester }} · Invertis University</p>
+        </div>
+      </div>
+      <div class="quick-actions">
+        <a href="/create-group" class="btn-quick-action">
+          <span class="action-icon">➕</span>
+          <span>New Group</span>
+        </a>
+        <a href="/find-partners" class="btn-quick-action">
+          <span class="action-icon">🔍</span>
+          <span>Find Partners</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-grid-dashboard">
+    <div class="stat-card-dashboard stat-blue">
+      <div class="stat-icon-dashboard">📚</div>
+      <div class="stat-details">
+        <div class="stat-value-dashboard">{{ my_groups|length }}</div>
+        <div class="stat-label-dashboard">My Groups</div>
+      </div>
+    </div>
+    <div class="stat-card-dashboard stat-green">
+      <div class="stat-icon-dashboard">👥</div>
+      <div class="stat-details">
+        <div class="stat-value-dashboard">{{ suggestions|length }}</div>
+        <div class="stat-label-dashboard">Study Partners</div>
+      </div>
+    </div>
+    <div class="stat-card-dashboard stat-yellow">
+      <div class="stat-icon-dashboard">📄</div>
+      <div class="stat-details">
+        <div class="stat-value-dashboard">{{ recent_notes|length }}</div>
+        <div class="stat-label-dashboard">Recent Notes</div>
+      </div>
+    </div>
+    <div class="stat-card-dashboard stat-purple">
+      <div class="stat-icon-dashboard">🎓</div>
+      <div class="stat-details">
+        <div class="stat-value-dashboard">Sem {{ session.semester }}</div>
+        <div class="stat-label-dashboard">Current Semester</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content Grid -->
+  <div class="dashboard-grid">
+    <!-- My Groups Section -->
+    <div class="dashboard-section">
+      <div class="section-header">
+        <div class="section-title">
+          <span class="section-icon">📚</span>
+          <h2>My Study Groups</h2>
+        </div>
+        <a href="/create-group" class="btn-section-action">
+          <span>➕</span>
+          <span>New Group</span>
+        </a>
+      </div>
+      <div class="section-content">
+        {% if my_groups %}
+          {% for group in my_groups %}
+          <div class="group-card-dashboard">
+            <div class="group-color-bar" style="background:{% if loop.index0 % 4 == 0 %}linear-gradient(135deg, #2563EB, #1D4ED8){% elif loop.index0 % 4 == 1 %}linear-gradient(135deg, #10B981, #059669){% elif loop.index0 % 4 == 2 %}linear-gradient(135deg, #8B5CF6, #7C3AED){% else %}linear-gradient(135deg, #F59E0B, #D97706){% endif %}"></div>
+            <div class="group-card-content">
+              <div class="group-card-info">
+                <h3 class="group-card-title">{{ group[1] }}</h3>
+                <p class="group-card-meta">
+                  <span class="meta-badge">{{ group[2] }}</span>
+                  <span class="meta-text">Semester {{ group[3] }}</span>
+                </p>
+              </div>
+              <a href="/group/{{ group[0] }}" class="btn-group-open">
+                <span>Open</span>
+                <span class="btn-arrow">→</span>
+              </a>
+            </div>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="empty-state-small">
+            <div class="empty-icon-small">📚</div>
+            <p>No groups yet. <a href="/create-group">Create your first group!</a></p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Right Column -->
+    <div class="dashboard-sidebar">
+      <!-- Suggested Partners -->
+      <div class="dashboard-section">
+        <div class="section-header">
+          <div class="section-title">
+            <span class="section-icon">👥</span>
+            <h2>Suggested Partners</h2>
+          </div>
+        </div>
+        <div class="section-content">
+          {% if suggestions %}
+            {% for student in suggestions[:3] %}
+            <div class="partner-card-dashboard">
+              <a href="/view-profile/{{ student[0] }}" class="partner-link">
+                <div class="partner-avatar" style="background:linear-gradient(135deg,{% if loop.index0 % 3 == 0 %}#EC4899,#8B5CF6{% elif loop.index0 % 3 == 1 %}#F59E0B,#EF4444{% else %}#10B981,#3B82F6{% endif %})">
+                  {{ student[1][0].upper() }}
+                </div>
+                <div class="partner-info-dashboard">
+                  <strong class="partner-name">{{ student[1] }}</strong>
+                  <small class="partner-meta">{{ student[2] }} · Sem {{ student[3] }}</small>
+                </div>
+              </a>
+              <button class="btn-connect" onclick="sendFriendRequestFromDashboard({{ student[0] }}, this)">
+                <span>Connect</span>
+              </button>
+            </div>
+            {% endfor %}
+            <a href="/find-partners" class="btn-see-all">
+              <span>See All Students</span>
+              <span class="btn-arrow">→</span>
+            </a>
+          {% else %}
+            <div class="empty-state-small">
+              <div class="empty-icon-small">👥</div>
+              <p>No suggestions available.</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Recent Notes -->
+      <div class="dashboard-section">
+        <div class="section-header">
+          <div class="section-title">
+            <span class="section-icon">📄</span>
+            <h2>Recent Notes</h2>
+          </div>
+        </div>
+        <div class="section-content">
+          {% if recent_notes %}
+            {% for note in recent_notes[:3] %}
+            <div class="note-card-dashboard">
+              <div class="note-icon-dashboard">📕</div>
+              <div class="note-info-dashboard">
+                <strong class="note-title">{{ note[3] }}</strong>
+                <small class="note-meta">{{ note[8] }} · by {{ note[7] }}</small>
+              </div>
+              <a href="/{{ note[5] }}" class="btn-download" download title="Download">
+                <span>↓</span>
+              </a>
+            </div>
+            {% endfor %}
+          {% else %}
+            <div class="empty-state-small">
+              <div class="empty-icon-small">📄</div>
+              <p>No notes yet. Join groups to see shared notes!</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+/* Demo Banner */
+.demo-banner {
+    background: linear-gradient(135deg, #FCD34D 0%, #F59E0B 100%);
+    padding: 16px 24px;
+    border-radius: 16px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 4px 16px rgba(245, 158, 11, 0.2);
+}
+
+.demo-icon {
+    font-size: 2rem;
+}
+
+.demo-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.demo-content strong {
+    color: #7C3AED;
+    font-weight: 700;
+}
+
+.demo-content span {
+    color: #92400E;
+    font-size: 0.9rem;
+}
+
+.demo-content a {
+    color: #7C3AED;
+    text-decoration: underline;
+    font-weight: 600;
+}
+
+/* Hero Header */
+.hero-header-dashboard {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 20px;
+    padding: 32px;
+    margin-bottom: 24px;
+    box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3);
+}
+
+.hero-content-dashboard {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+}
+
+.welcome-section {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+.icon-badge-dashboard {
+    width: 60px;
+    height: 60px;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+}
+
+.page-title-dashboard {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: white;
+    margin: 0 0 4px 0;
+}
+
+.page-subtitle-dashboard {
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.9);
+    margin: 0;
+}
+
+.quick-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.btn-quick-action {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 12px;
+    color: white;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+.btn-quick-action:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+.action-icon {
+    font-size: 1.1rem;
+}
+
+/* Stats Grid */
+.stats-grid-dashboard {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
+    margin-bottom: 32px;
+}
+
+.stat-card-dashboard {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+    border: 2px solid transparent;
+    transition: all 0.3s;
+}
+
+.stat-card-dashboard:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.stat-blue { border-color: #EFF6FF; }
+.stat-blue:hover { border-color: #2563EB; }
+.stat-green { border-color: #F0FDF4; }
+.stat-green:hover { border-color: #10B981; }
+.stat-yellow { border-color: #FEFCE8; }
+.stat-yellow:hover { border-color: #F59E0B; }
+.stat-purple { border-color: #F5F3FF; }
+.stat-purple:hover { border-color: #8B5CF6; }
+
+.stat-icon-dashboard {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+}
+
+.stat-blue .stat-icon-dashboard { background: #EFF6FF; }
+.stat-green .stat-icon-dashboard { background: #F0FDF4; }
+.stat-yellow .stat-icon-dashboard { background: #FEFCE8; }
+.stat-purple .stat-icon-dashboard { background: #F5F3FF; }
+
+.stat-value-dashboard {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #111827;
+    line-height: 1;
+}
+
+.stat-label-dashboard {
+    font-size: 0.85rem;
+    color: #6B7280;
+    font-weight: 600;
+}
+
+/* Dashboard Grid */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 24px;
+}
+
+/* Dashboard Section */
+.dashboard-section {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+    border: 1px solid #E5E7EB;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid #F3F4F6;
+}
+
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.section-icon {
+    font-size: 1.5rem;
+}
+
+.section-title h2 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #111827;
+    margin: 0;
+}
+
+.btn-section-action {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+.btn-section-action:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.section-content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* Group Card */
+.group-card-dashboard {
+    background: #F9FAFB;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #E5E7EB;
+    transition: all 0.3s;
+}
+
+.group-card-dashboard:hover {
+    transform: translateX(4px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.group-color-bar {
+    height: 4px;
+}
+
+.group-card-content {
+    padding: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+}
+
+.group-card-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #111827;
+    margin: 0 0 6px 0;
+}
+
+.group-card-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+}
+
+.meta-badge {
+    padding: 3px 10px;
+    background: white;
+    border-radius: 6px;
+    color: #667eea;
+    font-weight: 600;
+}
+
+.meta-text {
+    color: #6B7280;
+}
+
+.btn-group-open {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: white;
+    border: 1px solid #E5E7EB;
+    border-radius: 8px;
+    color: #667eea;
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+.btn-group-open:hover {
+    background: #667eea;
+    color: white;
+    border-color: #667eea;
+}
+
+.btn-arrow {
+    transition: transform 0.3s;
+}
+
+.btn-group-open:hover .btn-arrow {
+    transform: translateX(3px);
+}
+
+/* Partner Card */
+.partner-card-dashboard {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: #F9FAFB;
+    border-radius: 12px;
+    border: 1px solid #E5E7EB;
+    transition: all 0.3s;
+}
+
+.partner-card-dashboard:hover {
+    background: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.partner-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    text-decoration: none;
+    color: inherit;
+}
+
+.partner-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.partner-info-dashboard {
+    display: flex;
+    flex-direction: column;
+}
+
+.partner-name {
+    font-size: 0.95rem;
+    color: #111827;
+}
+
+.partner-meta {
+    font-size: 0.8rem;
+    color: #6B7280;
+}
+
+.btn-connect {
+    padding: 6px 14px;
+    background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-connect:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.btn-connect:disabled {
+    background: #F3F4F6;
+    color: #9CA3AF;
+    cursor: not-allowed;
+}
+
+/* Note Card */
+.note-card-dashboard {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: #F9FAFB;
+    border-radius: 12px;
+    border: 1px solid #E5E7EB;
+    transition: all 0.3s;
+}
+
+.note-card-dashboard:hover {
+    background: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.note-icon-dashboard {
+    font-size: 1.8rem;
+}
+
+.note-info-dashboard {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.note-title {
+    font-size: 0.9rem;
+    color: #111827;
+}
+
+.note-meta {
+    font-size: 0.75rem;
+    color: #6B7280;
+}
+
+.btn-download {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 8px;
+    font-size: 1.2rem;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+.btn-download:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+/* See All Button */
+.btn-see-all {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px;
+    background: white;
+    border: 2px solid #E5E7EB;
+    border-radius: 10px;
+    color: #667eea;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: all 0.3s;
+    margin-top: 8px;
+}
+
+.btn-see-all:hover {
+    background: #667eea;
+    color: white;
+    border-color: #667eea;
+}
+
+/* Empty State */
+.empty-state-small {
+    text-align: center;
+    padding: 32px 16px;
+}
+
+.empty-icon-small {
+    font-size: 2.5rem;
+    margin-bottom: 12px;
+    opacity: 0.4;
+}
+
+.empty-state-small p {
+    color: #6B7280;
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.empty-state-small a {
+    color: #667eea;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.empty-state-small a:hover {
+    text-decoration: underline;
+}
+
+/* Sidebar */
+.dashboard-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .hero-content-dashboard {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .quick-actions {
+        width: 100%;
+        flex-direction: column;
+    }
+    
+    .btn-quick-action {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .stats-grid-dashboard {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+</style>
+
+<script>
+function sendFriendRequestFromDashboard(userId, button) {
+    fetch(`/send-friend-request/${userId}`, {
+        method: 'POST'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            button.textContent = '✓ Sent';
+            button.disabled = true;
+            button.style.opacity = '0.6';
+        } else {
+            alert('Error: ' + (data.error || 'Failed to send request'));
+        }
+    })
+    .catch(error => {
+        alert('Error: ' + error);
+    });
+}
+</script>
+
+{% endblock %}
