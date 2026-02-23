@@ -59,11 +59,11 @@ if os.environ.get('PRODUCTION'):
     app.secret_key = os.environ.get('SECRET_KEY', 'learnloop_secret_2024')
     app.config['DEBUG'] = False
 else:
-    # Development configuration (local)
-    app.config['MYSQL_HOST'] = 'localhost'
-    app.config['MYSQL_USER'] = 'root'
-    app.config['MYSQL_PASSWORD'] = 'root'
-    app.config['MYSQL_DB'] = 'learnloop'
+    # Development configuration (using remote database)
+    app.config['MYSQL_HOST'] = 'sql12.freesqldatabase.com'
+    app.config['MYSQL_USER'] = 'sql12817859'
+    app.config['MYSQL_PASSWORD'] = 'YrEicfMveQ'
+    app.config['MYSQL_DB'] = 'sql12817859'
     app.secret_key = 'learnloop_secret_2024'
     app.config['DEBUG'] = True
 
