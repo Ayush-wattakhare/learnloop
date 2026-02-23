@@ -138,10 +138,10 @@
             <div class="participants-list">
                 {% for participant in participants %}
                 <div class="participant-item {% if participant[3] == 'host' %}host{% elif participant[3] == 'stage' %}stage{% endif %}">
-                    <div class="participant-avatar">{{ participant[6][0] }}</div>
+                    <div class="participant-avatar">{{ participant[8][0] }}</div>
                     <div class="participant-info">
                         <div class="participant-name">
-                            {{ participant[6] }}
+                            {{ participant[8] }}
                             {% if participant[3] == 'host' %}
                             <span class="role-badge host">Host</span>
                             {% elif participant[3] == 'stage' %}
