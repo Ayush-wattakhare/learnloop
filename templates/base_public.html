@@ -25,9 +25,11 @@
   
   <!-- Styles -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile-optimizations.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile-app-enhancements.css') }}">
   {% block extra_css %}{% endblock %}
 </head>
-<body>
+<body class="public-page">
   <!-- Navbar (Public - No Demo Mode Banner) -->
   <div class="navbar">
     <a href="/" class="navbar-brand"><span>📚</span> LearnLoop</a>

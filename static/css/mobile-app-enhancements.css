@@ -538,3 +538,37 @@
     background-size: 200% 100%;
   }
 }
+
+
+/* ── Public Pages Mobile Navbar ── */
+@media (max-width: 768px) {
+  /* Hide all nav links except login/signup on public pages */
+  body.public-page .navbar-links a.nav-link:not([href="/login"]) {
+    display: none !important;
+  }
+  
+  /* Make Get Started button more prominent on mobile */
+  body.public-page .navbar-links .nav-badge {
+    font-size: 0.85rem;
+    padding: 8px 16px;
+    white-space: nowrap;
+  }
+  
+  /* Simplify public navbar layout */
+  body.public-page .navbar {
+    padding: 12px 16px;
+    height: auto;
+    min-height: 58px;
+  }
+  
+  body.public-page .navbar-links {
+    gap: 8px;
+  }
+  
+  /* Login link styling on mobile */
+  body.public-page .navbar-links a[href="/login"] {
+    color: white;
+    font-size: 0.9rem;
+    padding: 6px 12px;
+  }
+}
