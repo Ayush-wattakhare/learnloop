@@ -1,9 +1,11 @@
-// LearnLoop Service Worker
-const CACHE_NAME = 'learnloop-v1.0.0';
+// LearnLoop Service Worker - Optimized
+const CACHE_NAME = 'learnloop-v1.1.0';
 const urlsToCache = [
   '/',
   '/static/css/style.css',
+  '/static/css/mobile-optimizations.css',
   '/static/js/main.js',
+  '/static/js/performance.js',
   '/static/manifest.json'
 ];
 
@@ -37,29 +39,57 @@ self.addEventListener('activate', event => {
   );
 });
 
-// Fetch strategy: Network first, fallback to cache
+// Optimized fetch strategy
 self.addEventListener('fetch', event => {
+  // Skip non-GET requests
+  if (event.request.method !== 'GET') return;
+  
+  // Skip chrome extensions
+  if (!event.request.url.startsWith('http')) return;
+  
+  // Cache-first strategy for static assets
+  if (event.request.url.includes('/static/')) {
+    event.respondWith(
+      caches.match(event.request)
+        .then(response => {
+          if (response) {
+            return response;
+          }
+          return fetch(event.request).then(response => {
+            if (response && response.status === 200) {
+              const responseToCache = response.clone();
+              caches.open(CACHE_NAME).then(cache => {
+                cache.put(event.request, responseToCache);
+              });
+            }
+            return response;
+          });
+        })
+    );
+    return;
+  }
+  
+  // Network-first strategy for dynamic content
   event.respondWith(
     fetch(event.request)
       .then(response => {
-        // Clone the response
-        const responseToCache = response.clone();
-        
-        // Cache the fetched response
-        caches.open(CACHE_NAME).then(cache => {
-          cache.put(event.request, responseToCache);
-        });
-        
+        // Clone and cache successful responses
+        if (response && response.status === 200) {
+          const responseToCache = response.clone();
+          caches.open(CACHE_NAME).then(cache => {
+            cache.put(event.request, responseToCache);
+          });
+        }
         return response;
       })
       .catch(() => {
-        // If network fails, try cache
+        // Fallback to cache if network fails
         return caches.match(event.request)
           .then(response => {
             if (response) {
               return response;
             }
-            // Return offline page if available
+            // Return offline page
             return caches.match('/');
           });
       })
@@ -73,4 +103,15 @@ self.addEventListener('message', event => {
   }
 });
 
-console.log('[Service Worker] Loaded');
+// Background sync for offline actions
+self.addEventListener('sync', event => {
+  if (event.tag === 'sync-data') {
+    event.waitUntil(syncOfflineData());
+  }
+});
+
+function syncOfflineData() {
+  return Promise.resolve();
+}
+
+console.log('[Service Worker] Loaded and optimized');
