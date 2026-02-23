@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+  <title>{% block title %}LearnLoop{% endblock %}</title>
+  
+  <!-- PWA Meta Tags -->
+  <meta name="description" content="Connect with study partners, share notes, and collaborate. LearnLoop - Where Learning Connects.">
+  <meta name="theme-color" content="#2563EB">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="LearnLoop">
+  <meta name="mobile-web-app-capable" content="yes">
+  
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="/static/manifest.json">
+  
+  <!-- Icons -->
+  <link rel="icon" type="image/png" sizes="192x192" href="/static/icons/icon-192x192.png">
+  <link rel="apple-touch-icon" href="/static/icons/icon-192x192.png">
+  
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+  <!-- Navbar (Public - No Demo Mode Banner) -->
+  <div class="navbar">
+    <a href="/" class="navbar-brand"><span>📚</span> LearnLoop</a>
+    <div class="navbar-links">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/features" class="nav-link">Features</a>
+      <a href="/about" class="nav-link">About</a>
+      <a href="/login" class="nav-link">Login</a>
+      <a href="/register"><button class="nav-badge">Get Started →</button></a>
+    </div>
+  </div>
+
+  <!-- Flash Messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="flash-message flash-{{ category }}">
+          {{ message }}
+          <button onclick="this.parentElement.remove()" style="background:none;border:none;color:inherit;cursor:pointer;font-size:1.2rem;padding:0 8px">×</button>
+        </div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <!-- Main Content -->
+  {% block content %}{% endblock %}
+
+  <!-- Footer -->
+  <div class="footer">
+    <div class="footer-content">
+      <div class="footer-section">
+        <h3>📚 LearnLoop</h3>
+        <p>Where Learning Connects</p>
+      </div>
+      <div class="footer-section">
+        <h4>Quick Links</h4>
+        <a href="/">Home</a>
+        <a href="/features">Features</a>
+        <a href="/about">About</a>
+      </div>
+      <div class="footer-section">
+        <h4>Get Started</h4>
+        <a href="/register">Sign Up</a>
+        <a href="/login">Login</a>
+        <a href="/demo">Try Demo</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2024 LearnLoop. Built for students, by students.</p>
+    </div>
+  </div>
+
+  {% block extra_js %}{% endblock %}
+</body>
+</html>
