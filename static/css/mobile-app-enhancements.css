@@ -125,8 +125,8 @@
     padding-bottom: calc(80px + env(safe-area-inset-bottom)) !important;
   }
   
-  /* Hide desktop navbar links on mobile */
-  .navbar-links {
+  /* Hide desktop navbar links on mobile (but keep profile dropdown, notifications, dark mode) */
+  .navbar-links a.nav-link:not(.notification-bell) {
     display: none !important;
   }
   
