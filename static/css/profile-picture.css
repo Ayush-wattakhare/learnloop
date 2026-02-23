@@ -1,0 +1,449 @@
+/* ══════════════════════════════════════════════════════════════════════
+   Profile Picture Modal Styles
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* ── Modal Overlay ── */
+.profile-picture-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  z-index: 10000;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ── Modal Content ── */
+.profile-picture-modal-content {
+  background: white;
+  border-radius: 20px;
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Modal Header ── */
+.modal-header {
+  padding: 24px;
+  border-bottom: 1px solid #E5E7EB;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #111827;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #6B7280;
+  cursor: pointer;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.modal-close:hover {
+  background: #F3F4F6;
+  color: #111827;
+}
+
+/* ── Modal Body ── */
+.modal-body {
+  padding: 24px;
+}
+
+/* ── Image Preview Area ── */
+.image-preview-container {
+  border: 2px dashed #E5E7EB;
+  border-radius: 16px;
+  padding: 40px 20px;
+  text-align: center;
+  background: #F9FAFB;
+  margin-bottom: 20px;
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.image-preview-container p {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+#cropImage {
+  max-width: 100%;
+  max-height: 400px;
+  display: block;
+}
+
+/* ── Upload Button ── */
+.upload-trigger-btn {
+  background: linear-gradient(135deg, #2563EB, #4338CA);
+  color: white;
+  border: none;
+  padding: 14px 32px;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.upload-trigger-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
+}
+
+.upload-trigger-btn:active {
+  transform: translateY(0);
+}
+
+/* ── Crop Controls ── */
+.crop-controls {
+  display: none;
+  margin-top: 20px;
+}
+
+.crop-controls-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #374151;
+  margin-bottom: 12px;
+}
+
+.crop-buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.crop-btn {
+  background: white;
+  border: 2px solid #E5E7EB;
+  padding: 10px;
+  border-radius: 10px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 48px;
+}
+
+.crop-btn:hover {
+  border-color: #2563EB;
+  background: #EFF6FF;
+  transform: translateY(-2px);
+}
+
+.crop-btn:active {
+  transform: translateY(0);
+}
+
+.crop-btn-label {
+  font-size: 0.7rem;
+  color: #6B7280;
+  margin-top: 4px;
+  display: block;
+}
+
+/* ── Action Buttons ── */
+.modal-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.btn-upload {
+  background: linear-gradient(135deg, #10B981, #059669);
+  color: white;
+  border: none;
+  padding: 14px 24px;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.btn-upload:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+}
+
+.btn-upload:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-remove {
+  background: linear-gradient(135deg, #EF4444, #DC2626);
+  color: white;
+  border: none;
+  padding: 14px 24px;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.btn-remove:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
+}
+
+/* ── Spinner ── */
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Notification ── */
+.notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: white;
+  padding: 16px 20px;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 10001;
+  transform: translateX(400px);
+  transition: transform 0.3s ease;
+  max-width: 400px;
+}
+
+.notification.show {
+  transform: translateX(0);
+}
+
+.notification-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.notification-success .notification-icon {
+  background: #D1FAE5;
+  color: #059669;
+}
+
+.notification-error .notification-icon {
+  background: #FEE2E2;
+  color: #DC2626;
+}
+
+.notification-info .notification-icon {
+  background: #DBEAFE;
+  color: #2563EB;
+}
+
+.notification-message {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+/* ── Profile Avatar Hover Effect ── */
+.profile-avatar {
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.profile-avatar:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.profile-avatar::after {
+  content: '📷';
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  background: white;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.profile-avatar:hover::after {
+  opacity: 1;
+}
+
+/* ── Mobile Responsive ── */
+@media (max-width: 768px) {
+  .profile-picture-modal {
+    padding: 0;
+    align-items: flex-end;
+  }
+  
+  .profile-picture-modal-content {
+    max-width: 100%;
+    max-height: 95vh;
+    border-radius: 20px 20px 0 0;
+    animation: slideUpMobile 0.3s ease;
+  }
+  
+  @keyframes slideUpMobile {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+  
+  .modal-header {
+    padding: 20px;
+  }
+  
+  .modal-header h2 {
+    font-size: 1.3rem;
+  }
+  
+  .modal-body {
+    padding: 20px;
+  }
+  
+  .crop-buttons {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+  }
+  
+  .crop-btn {
+    padding: 8px;
+    font-size: 1rem;
+    height: 44px;
+  }
+  
+  .modal-actions {
+    grid-template-columns: 1fr;
+  }
+  
+  .notification {
+    top: auto;
+    bottom: calc(80px + env(safe-area-inset-bottom));
+    right: 16px;
+    left: 16px;
+    max-width: none;
+  }
+}
+
+/* ── Dark Mode Support ── */
+.dark-mode .profile-picture-modal-content {
+  background: #1F2937;
+}
+
+.dark-mode .modal-header {
+  border-bottom-color: #374151;
+}
+
+.dark-mode .modal-header h2 {
+  color: white;
+}
+
+.dark-mode .modal-close {
+  color: #9CA3AF;
+}
+
+.dark-mode .modal-close:hover {
+  background: #374151;
+  color: white;
+}
+
+.dark-mode .image-preview-container {
+  background: #111827;
+  border-color: #374151;
+}
+
+.dark-mode .crop-btn {
+  background: #111827;
+  border-color: #374151;
+  color: white;
+}
+
+.dark-mode .crop-btn:hover {
+  background: #1F2937;
+  border-color: #2563EB;
+}
+
+.dark-mode .notification {
+  background: #1F2937;
+}
+
+.dark-mode .notification-message {
+  color: #E5E7EB;
+}

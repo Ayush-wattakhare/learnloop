@@ -377,6 +377,7 @@ def login():
             session['user_id']   = user[0]
             session['user_name'] = user[1]
             session['semester']  = user[4]
+            session['profile_picture'] = user[7] if len(user) > 7 else None  # profile_picture column
             session['last_activity'] = datetime.now().isoformat()
             
             flash(f'Welcome back, {user[1]}!', 'success')
@@ -1094,12 +1095,33 @@ def upload_profile_picture():
             cur.close()
             print(f"Database updated successfully")
             
-            return jsonify({'success': True, 'filename': filename})
+            return jsonify({
+                'success': True, 
+                'filename': filename,
+                'profile_picture_url': f'/static/uploads/profiles/{filename}'
+            })
         
         return jsonify({'error': 'Upload failed'}), 500
     except Exception as e:
         import traceback
         print(f"Error uploading profile picture: {e}")
+        print(traceback.format_exc())
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/remove-profile-picture', methods=['POST'])
+@login_required
+def remove_profile_picture():
+    try:
+        # Update database to remove profile picture
+        cur = mysql.connection.cursor()
+        cur.execute("UPDATE users SET profile_picture=NULL WHERE id=%s", [session['user_id']])
+        mysql.connection.commit()
+        cur.close()
+        
+        return jsonify({'success': True})
+    except Exception as e:
+        import traceback
+        print(f"Error removing profile picture: {e}")
         print(traceback.format_exc())
         return jsonify({'error': str(e)}), 500
 

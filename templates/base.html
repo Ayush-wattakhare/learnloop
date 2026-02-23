@@ -27,6 +27,9 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile-optimizations.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile-app-enhancements.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/profile-picture.css') }}">
+  <!-- Cropper.js CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
   {% block extra_css %}{% endblock %}
 </head>
 <body>
@@ -59,7 +62,9 @@
         <!-- Profile Dropdown -->
         <div class="profile-dropdown">
           <button class="profile-btn" onclick="toggleProfileMenu()">
-            <div class="profile-avatar">{{ session.user_name[0].upper() }}</div>
+            <div class="profile-avatar" {% if session.profile_picture %}style="background-image: url('/static/uploads/profiles/{{ session.profile_picture }}'); background-size: cover; background-position: center;"{% endif %}>
+              {% if not session.profile_picture %}{{ session.user_name[0].upper() }}{% endif %}
+            </div>
             <span>{{ session.user_name }}</span>
             <span class="dropdown-arrow">▼</span>
           </button>
@@ -112,6 +117,70 @@
   <!-- Main Content -->
   {% block content %}{% endblock %}
 
+  <!-- Profile Picture Modal -->
+  {% if session.user_id %}
+  <div id="profilePictureModal" class="profile-picture-modal">
+    <div class="profile-picture-modal-content">
+      <div class="modal-header">
+        <h2>Profile Picture</h2>
+        <button class="modal-close" onclick="closeProfilePictureModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <!-- File Input (Hidden) -->
+        <input type="file" id="profilePictureInput" accept="image/*" style="display: none;">
+        
+        <!-- Upload Button -->
+        <button class="upload-trigger-btn" onclick="triggerFileInput()">
+          📷 Choose Photo
+        </button>
+        
+        <!-- Image Preview -->
+        <div class="image-preview-container" id="imagePreview">
+          <p style="color: #9CA3AF;">Select an image to preview</p>
+        </div>
+        
+        <!-- Crop Controls -->
+        <div id="cropControls" class="crop-controls">
+          <div class="crop-controls-title">✂️ Adjust Image</div>
+          <div class="crop-buttons">
+            <button class="crop-btn" onclick="zoomIn()" title="Zoom In">
+              🔍+
+            </button>
+            <button class="crop-btn" onclick="zoomOut()" title="Zoom Out">
+              🔍-
+            </button>
+            <button class="crop-btn" onclick="rotateLeft()" title="Rotate Left">
+              ↶
+            </button>
+            <button class="crop-btn" onclick="rotateRight()" title="Rotate Right">
+              ↷
+            </button>
+            <button class="crop-btn" onclick="flipHorizontal()" title="Flip Horizontal">
+              ↔️
+            </button>
+            <button class="crop-btn" onclick="flipVertical()" title="Flip Vertical">
+              ↕️
+            </button>
+            <button class="crop-btn" onclick="resetCrop()" title="Reset">
+              🔄
+            </button>
+          </div>
+          
+          <!-- Action Buttons -->
+          <div class="modal-actions">
+            <button id="uploadBtn" class="btn-upload" onclick="uploadCroppedImage()">
+              ✓ Upload
+            </button>
+            <button class="btn-remove" onclick="removeProfilePicture()">
+              🗑️ Remove
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
   <!-- Notification Bell Styles -->
   <style>
     .notification-bell {
@@ -134,8 +203,11 @@
   </style>
 
   <!-- Scripts -->
+  <!-- Cropper.js Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
   <script src="{{ url_for('static', filename='js/performance.js') }}" defer></script>
   <script src="{{ url_for('static', filename='js/mobile-app.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/profile-picture.js') }}" defer></script>
   <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
   
   <!-- Profile Dropdown Script -->
