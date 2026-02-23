@@ -391,6 +391,188 @@ def logout():
     flash('Logged out successfully!', 'info')
     return redirect('/')
 
+# ─── FORGOT PASSWORD ──────────────────────────────────────────────
+@app.route('/forgot-password', methods=['GET', 'POST'])
+def forgot_password():
+    if not DB_AVAILABLE:
+        flash('⚠️ Database not configured. This feature is not available.', 'warning')
+        return redirect('/login')
+    
+    if request.method == 'POST':
+        email = request.form.get('email', '').strip().lower()
+        
+        if not email:
+            flash('Email is required!', 'danger')
+            return render_template('forgot_password.html')
+        
+        # Check if user exists
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT id, name FROM users WHERE email=%s", [email])
+        user = cur.fetchone()
+        
+        if user:
+            # Generate 6-digit OTP
+            import random
+            otp = ''.join([str(random.randint(0, 9)) for _ in range(6)])
+            
+            # Calculate expiry time (10 minutes from now)
+            from datetime import datetime, timedelta
+            expires_at = datetime.now() + timedelta(minutes=10)
+            
+            # Store OTP in database
+            cur.execute("""
+                INSERT INTO password_reset_otps (email, otp, expires_at) 
+                VALUES (%s, %s, %s)
+            """, (email, otp, expires_at))
+            mysql.connection.commit()
+            
+            # In production, send email here
+            # For now, we'll show it in flash message (for testing)
+            flash(f'OTP sent to {email}! Your OTP is: {otp} (Valid for 10 minutes)', 'success')
+            
+            # Store email in session for verification
+            session['reset_email'] = email
+            
+            cur.close()
+            return redirect('/verify-otp')
+        else:
+            # Don't reveal if email exists or not (security)
+            flash(f'If an account exists with {email}, an OTP has been sent.', 'info')
+        
+        cur.close()
+    
+    return render_template('forgot_password.html')
+
+@app.route('/verify-otp', methods=['GET', 'POST'])
+def verify_otp():
+    if not DB_AVAILABLE:
+        flash('⚠️ Database not configured.', 'warning')
+        return redirect('/login')
+    
+    email = session.get('reset_email')
+    if not email:
+        flash('Please request a password reset first.', 'warning')
+        return redirect('/forgot-password')
+    
+    if request.method == 'POST':
+        # Combine OTP digits
+        otp = ''.join([
+            request.form.get('otp1', ''),
+            request.form.get('otp2', ''),
+            request.form.get('otp3', ''),
+            request.form.get('otp4', ''),
+            request.form.get('otp5', ''),
+            request.form.get('otp6', '')
+        ])
+        
+        if len(otp) != 6:
+            flash('Please enter all 6 digits!', 'danger')
+            return render_template('verify_otp.html', email=email)
+        
+        # Verify OTP
+        cur = mysql.connection.cursor()
+        cur.execute("""
+            SELECT id FROM password_reset_otps 
+            WHERE email=%s AND otp=%s AND used=FALSE AND expires_at > NOW()
+            ORDER BY created_at DESC LIMIT 1
+        """, (email, otp))
+        otp_record = cur.fetchone()
+        
+        if otp_record:
+            # Mark OTP as used
+            cur.execute("UPDATE password_reset_otps SET used=TRUE WHERE id=%s", [otp_record[0]])
+            mysql.connection.commit()
+            cur.close()
+            
+            # Store verification in session
+            session['otp_verified'] = True
+            flash('OTP verified successfully! Set your new password.', 'success')
+            return redirect('/reset-password')
+        else:
+            cur.close()
+            flash('Invalid or expired OTP. Please try again.', 'danger')
+    
+    return render_template('verify_otp.html', email=email)
+
+@app.route('/reset-password', methods=['GET', 'POST'])
+def reset_password():
+    if not DB_AVAILABLE:
+        flash('⚠️ Database not configured.', 'warning')
+        return redirect('/login')
+    
+    email = session.get('reset_email')
+    otp_verified = session.get('otp_verified')
+    
+    if not email or not otp_verified:
+        flash('Please complete OTP verification first.', 'warning')
+        return redirect('/forgot-password')
+    
+    if request.method == 'POST':
+        password = request.form.get('password', '')
+        confirm_password = request.form.get('confirm_password', '')
+        
+        if not password or not confirm_password:
+            flash('Both password fields are required!', 'danger')
+            return render_template('reset_password.html', email=email)
+        
+        if len(password) < 6:
+            flash('Password must be at least 6 characters!', 'danger')
+            return render_template('reset_password.html', email=email)
+        
+        if password != confirm_password:
+            flash('Passwords do not match!', 'danger')
+            return render_template('reset_password.html', email=email)
+        
+        # Update password
+        hashed_password = generate_password_hash(password)
+        cur = mysql.connection.cursor()
+        cur.execute("UPDATE users SET password=%s WHERE email=%s", (hashed_password, email))
+        mysql.connection.commit()
+        cur.close()
+        
+        # Clear session
+        session.pop('reset_email', None)
+        session.pop('otp_verified', None)
+        
+        flash('Password reset successfully! You can now login with your new password.', 'success')
+        return redirect('/login')
+    
+    return render_template('reset_password.html', email=email)
+
+@app.route('/resend-otp')
+def resend_otp():
+    if not DB_AVAILABLE:
+        flash('⚠️ Database not configured.', 'warning')
+        return redirect('/login')
+    
+    email = request.args.get('email') or session.get('reset_email')
+    
+    if not email:
+        flash('Invalid request.', 'danger')
+        return redirect('/forgot-password')
+    
+    # Generate new OTP
+    import random
+    from datetime import datetime, timedelta
+    
+    otp = ''.join([str(random.randint(0, 9)) for _ in range(6)])
+    expires_at = datetime.now() + timedelta(minutes=10)
+    
+    # Store new OTP
+    cur = mysql.connection.cursor()
+    cur.execute("""
+        INSERT INTO password_reset_otps (email, otp, expires_at) 
+        VALUES (%s, %s, %s)
+    """, (email, otp, expires_at))
+    mysql.connection.commit()
+    cur.close()
+    
+    # In production, send email here
+    flash(f'New OTP sent! Your OTP is: {otp} (Valid for 10 minutes)', 'success')
+    
+    session['reset_email'] = email
+    return redirect('/verify-otp')
+
 # ─── DASHBOARD ────────────────────────────────────────────────────
 @app.route('/dashboard')
 @login_required

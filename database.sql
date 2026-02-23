@@ -64,3 +64,16 @@ CREATE TABLE messages (
     FOREIGN KEY (group_id) REFERENCES groups(id),
     FOREIGN KEY (user_id)  REFERENCES users(id)
 );
+
+
+-- Password Reset OTP Table
+CREATE TABLE IF NOT EXISTS password_reset_otps (
+    id          INT AUTO_INCREMENT PRIMARY KEY,
+    email       VARCHAR(100) NOT NULL,
+    otp         VARCHAR(6) NOT NULL,
+    created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    expires_at  TIMESTAMP NOT NULL,
+    used        BOOLEAN DEFAULT FALSE,
+    INDEX idx_email (email),
+    INDEX idx_otp (otp)
+);
