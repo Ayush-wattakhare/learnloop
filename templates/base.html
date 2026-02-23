@@ -20,15 +20,32 @@
   <link rel="icon" type="image/png" sizes="192x192" href="/static/icons/icon-192x192.png">
   <link rel="apple-touch-icon" href="/static/icons/icon-192x192.png">
   
-  <!-- Fonts - Optimized with display=swap -->
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="preconnect">
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <!-- Fonts - Preconnect for faster loading -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"></noscript>
   
-  <!-- Styles -->
+  <!-- Critical CSS - Inline for instant render -->
+  <style>
+    /* Critical above-the-fold styles */
+    body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f9fafb}
+    .navbar{background:linear-gradient(135deg,#1D4ED8,#4338CA);padding:0 32px;height:58px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 12px rgba(0,0,0,0.1)}
+    .navbar-brand{color:white;font-weight:800;font-size:1.2rem;text-decoration:none}
+    .container{max-width:1400px;margin:0 auto;padding:32px 24px}
+    @media(max-width:768px){.container{padding:20px 16px}}
+  </style>
+  
+  <!-- Styles - Load async for non-critical CSS -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile-optimizations.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile-app-enhancements.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/profile-picture.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile-optimizations.css') }}" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile-app-enhancements.css') }}" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/profile-picture.css') }}" media="print" onload="this.media='all'">
+  <noscript>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile-optimizations.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile-app-enhancements.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/profile-picture.css') }}">
+  </noscript>
   {% block extra_css %}{% endblock %}
 </head>
 <body>
@@ -244,7 +261,7 @@
     // Update notification count on page load and every 30 seconds
     {% if session.user_id %}
     updateNotificationCount();
-    setInterval(updateNotificationCount, 30000);
+    setInterval(updateNotificationCount, 60000);  // Check every 60 seconds instead of 30
     {% endif %}
   </script>
   

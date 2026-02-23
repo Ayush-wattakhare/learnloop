@@ -11,6 +11,8 @@ import secrets
 import re
 from datetime import datetime, timedelta
 from functools import wraps
+import gzip
+from io import BytesIO
 
 app = Flask(__name__)
 
@@ -48,6 +50,22 @@ def set_security_headers(response):
         response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
         response.headers['Pragma'] = 'no-cache'
         response.headers['Expires'] = '0'
+    
+    # Compress responses for faster transfer
+    if response.status_code < 300 and \
+       response.content_length and response.content_length > 500 and \
+       'gzip' in request.headers.get('Accept-Encoding', '').lower() and \
+       'Content-Encoding' not in response.headers:
+        
+        # Compress HTML, CSS, JS, JSON
+        if any(response.content_type.startswith(ct) for ct in ['text/', 'application/json', 'application/javascript']):
+            gzip_buffer = BytesIO()
+            with gzip.GzipFile(mode='wb', fileobj=gzip_buffer, compresslevel=6) as gzip_file:
+                gzip_file.write(response.get_data())
+            
+            response.set_data(gzip_buffer.getvalue())
+            response.headers['Content-Encoding'] = 'gzip'
+            response.headers['Content-Length'] = len(response.get_data())
     
     return response
 
@@ -103,6 +121,31 @@ except Exception as e:
     print(f"   Error: {str(e)}")
     print("⚠️  Running in DEMO MODE ONLY")
     print("   To enable full features, setup MySQL database")
+
+# ─── Simple Query Cache ───────────────────────────────────────────
+from datetime import datetime as dt
+query_cache = {}
+CACHE_TTL = 300  # 5 minutes
+
+def get_cached_query(key):
+    """Get cached query result if not expired"""
+    if key in query_cache:
+        cached_data, timestamp = query_cache[key]
+        if (dt.now() - timestamp).total_seconds() < CACHE_TTL:
+            return cached_data
+        else:
+            del query_cache[key]
+    return None
+
+def set_cached_query(key, data):
+    """Cache query result with timestamp"""
+    query_cache[key] = (data, dt.now())
+
+def clear_cache_pattern(pattern):
+    """Clear cache entries matching pattern"""
+    keys_to_delete = [k for k in query_cache.keys() if pattern in k]
+    for key in keys_to_delete:
+        del query_cache[key]
 
 # ─── File Upload Config ───────────────────────────────────────────
 UPLOAD_FOLDER = 'static/uploads'
