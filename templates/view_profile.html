@@ -9,10 +9,30 @@
             <!-- Profile Picture -->
             <div class="profile-picture-large-container">
                 {% if user[7] %}
-                    <img src="{{ url_for('static', filename='uploads/profiles/' + user[7]) }}" class="profile-picture-xlarge">
+                    <div class="profile-picture-wrapper" onclick="{% if is_own_profile %}openProfilePictureModal(){% else %}viewFullProfilePicture('{{ url_for('static', filename='uploads/profiles/' + user[7]) }}'){% endif %}">
+                        <img src="{{ url_for('static', filename='uploads/profiles/' + user[7]) }}" class="profile-picture-xlarge">
+                        {% if is_own_profile %}
+                            <div class="profile-picture-overlay">
+                                <span class="edit-icon">📷</span>
+                                <span class="edit-text">Edit</span>
+                            </div>
+                        {% else %}
+                            <div class="profile-picture-overlay">
+                                <span class="view-icon">🔍</span>
+                            </div>
+                        {% endif %}
+                    </div>
                 {% else %}
-                    <div class="avatar" style="width:120px; height:120px; font-size:3rem">
-                        {{ user[1][0].upper() }}
+                    <div class="profile-picture-wrapper" {% if is_own_profile %}onclick="openProfilePictureModal()"{% endif %}>
+                        <div class="avatar" style="width:120px; height:120px; font-size:3rem">
+                            {{ user[1][0].upper() }}
+                        </div>
+                        {% if is_own_profile %}
+                            <div class="profile-picture-overlay">
+                                <span class="edit-icon">📷</span>
+                                <span class="edit-text">Add Photo</span>
+                            </div>
+                        {% endif %}
                     </div>
                 {% endif %}
             </div>
@@ -172,6 +192,91 @@
     box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 
+.profile-picture-wrapper {
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.profile-picture-wrapper:hover {
+    transform: scale(1.05);
+}
+
+.profile-picture-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    color: white;
+}
+
+.profile-picture-wrapper:hover .profile-picture-overlay {
+    opacity: 1;
+}
+
+.edit-icon, .view-icon {
+    font-size: 2rem;
+    margin-bottom: 4px;
+}
+
+.edit-text {
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+/* Full Size Image Viewer */
+.full-image-viewer {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 10000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    animation: fadeIn 0.2s ease;
+}
+
+.full-image-viewer img {
+    max-width: 90%;
+    max-height: 90vh;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.close-viewer {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: white;
+    color: #111827;
+    border: none;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: all 0.2s ease;
+}
+
+.close-viewer:hover {
+    transform: scale(1.1);
+    background: #F3F4F6;
+}
+
 .profile-info {
     flex: 1;
 }
@@ -287,6 +392,31 @@ function rejectFriendRequest(userId) {
         });
     }
 }
+
+// View full profile picture
+function viewFullProfilePicture(imageUrl) {
+    const viewer = document.createElement('div');
+    viewer.className = 'full-image-viewer';
+    viewer.innerHTML = `
+        <button class="close-viewer" onclick="this.parentElement.remove()">×</button>
+        <img src="${imageUrl}" alt="Profile Picture">
+    `;
+    viewer.onclick = function(e) {
+        if (e.target === viewer) {
+            viewer.remove();
+        }
+    };
+    document.body.appendChild(viewer);
+    setTimeout(() => viewer.style.display = 'flex', 10);
+}
+
+// Keyboard shortcut to close viewer
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        const viewer = document.querySelector('.full-image-viewer');
+        if (viewer) viewer.remove();
+    }
+});
 </script>
 
 {% endblock %}

@@ -7,15 +7,24 @@
   <div style="margin-bottom:24px; text-align:center">
     <div class="profile-picture-container">
       {% if user[8] %}
-        <img src="{{ url_for('static', filename='uploads/profiles/' + user[8]) }}" alt="Profile" class="profile-picture-large">
+        <div class="profile-picture-wrapper-edit" onclick="openProfilePictureModal()">
+          <img src="{{ url_for('static', filename='uploads/profiles/' + user[8]) }}" alt="Profile" class="profile-picture-large">
+          <div class="profile-picture-overlay-edit">
+            <span class="edit-icon">📷</span>
+            <span class="edit-text">Edit</span>
+          </div>
+        </div>
       {% else %}
-        <div class="avatar avatar-lg" style="width:100px; height:100px; font-size:2.5rem; margin:0 auto">
-          {{ user[1][0].upper() }}
+        <div class="profile-picture-wrapper-edit" onclick="openProfilePictureModal()">
+          <div class="avatar avatar-lg" style="width:100px; height:100px; font-size:2.5rem; margin:0 auto">
+            {{ user[1][0].upper() }}
+          </div>
+          <div class="profile-picture-overlay-edit">
+            <span class="edit-icon">📷</span>
+            <span class="edit-text">Add Photo</span>
+          </div>
         </div>
       {% endif %}
-      <button class="change-picture-btn" onclick="document.getElementById('profilePictureInput').click()">
-        📷 Change Picture
-      </button>
     </div>
     <h3 style="font-weight:800; font-size:1.3rem; margin-top:16px">Edit Your Profile</h3>
     <p class="text-muted">Update your information and preferences</p>
@@ -23,11 +32,6 @@
 
   <div class="card">
     <div class="card-body">
-      <!-- Profile Picture Upload Form -->
-      <form id="profilePictureForm" method="POST" action="/upload-profile-picture" enctype="multipart/form-data" style="display:none">
-        <input type="file" id="profilePictureInput" name="profile_picture" accept="image/*" onchange="uploadProfilePicture()">
-      </form>
-
       <!-- Profile Info Form -->
       <form method="POST" action="/profile">
         <div class="form-group">
@@ -95,59 +99,47 @@
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
-.change-picture-btn {
-  position: absolute;
-  bottom: 0;
-  right: -10px;
-  background: linear-gradient(135deg, #2563EB, #4338CA);
-  color: white;
-  border: 3px solid white;
-  border-radius: 20px;
-  padding: 6px 12px;
-  font-size: 0.75rem;
-  font-weight: 600;
+.profile-picture-wrapper-edit {
+  position: relative;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  transition: all 0.2s;
+  transition: transform 0.2s ease;
+  display: inline-block;
 }
 
-.change-picture-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+.profile-picture-wrapper-edit:hover {
+  transform: scale(1.05);
+}
+
+.profile-picture-overlay-edit {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  color: white;
+}
+
+.profile-picture-wrapper-edit:hover .profile-picture-overlay-edit {
+  opacity: 1;
+}
+
+.edit-icon {
+  font-size: 2rem;
+  margin-bottom: 4px;
+}
+
+.edit-text {
+  font-size: 0.85rem;
+  font-weight: 600;
 }
 </style>
-
-<script>
-function uploadProfilePicture() {
-  const form = document.getElementById('profilePictureForm');
-  const formData = new FormData(form);
-  
-  fetch('/upload-profile-picture', {
-    method: 'POST',
-    body: formData
-  })
-  .then(response => {
-    if (!response.ok) {
-      return response.text().then(text => {
-        console.error('Server response:', text);
-        throw new Error(`Server error: ${response.status}`);
-      });
-    }
-    return response.json();
-  })
-  .then(data => {
-    if (data.success) {
-      alert('Profile picture updated successfully!');
-      window.location.reload();
-    } else {
-      alert('Error: ' + (data.error || 'Failed to upload picture'));
-    }
-  })
-  .catch(error => {
-    console.error('Upload error:', error);
-    alert('Error uploading picture: ' + error.message);
-  });
-}
-</script>
 
 {% endblock %}
