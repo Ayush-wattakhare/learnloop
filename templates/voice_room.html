@@ -869,12 +869,12 @@ function checkRoomStatus() {
     const isHost = {{ 'true' if room[4]|int == session.user_id|int else 'false' }};
     
     if (isHost && !roomStarted) {
-        // Show start button for host
+        // Show start button for host (NO waiting overlay for host!)
         document.getElementById('startRoomBtn').style.display = 'inline-block';
-        document.getElementById('waitingOverlay').style.display = 'flex';
+        document.getElementById('waitingOverlay').style.display = 'none';
         document.getElementById('liveBadge').textContent = '⏸️ NOT STARTED';
     } else if (!isHost && !hostOnline) {
-        // Show waiting overlay for participants
+        // Show waiting overlay for participants only
         document.getElementById('waitingOverlay').style.display = 'flex';
         document.getElementById('liveBadge').textContent = '⏳ WAITING';
     }
