@@ -542,33 +542,114 @@
 
 /* ── Public Pages Mobile Navbar ── */
 @media (max-width: 768px) {
-  /* Hide all nav links except login/signup on public pages */
-  body.public-page .navbar-links a.nav-link:not([href="/login"]) {
-    display: none !important;
+  /* Hamburger Menu Toggle Button */
+  .mobile-menu-toggle {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    width: 30px;
+    height: 25px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    z-index: 10001;
   }
   
-  /* Make Get Started button more prominent on mobile */
+  .mobile-menu-toggle span {
+    width: 30px;
+    height: 3px;
+    background: white;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    transform-origin: center;
+  }
+  
+  .mobile-menu-toggle.active span:nth-child(1) {
+    transform: rotate(45deg) translate(7px, 7px);
+  }
+  
+  .mobile-menu-toggle.active span:nth-child(2) {
+    opacity: 0;
+  }
+  
+  .mobile-menu-toggle.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(7px, -7px);
+  }
+  
+  /* Hide hamburger on desktop */
+  @media (min-width: 769px) {
+    .mobile-menu-toggle {
+      display: none;
+    }
+  }
+  
+  /* Mobile Menu Dropdown */
+  body.public-page .navbar-links {
+    position: fixed;
+    top: 58px;
+    left: 0;
+    right: 0;
+    background: linear-gradient(135deg, rgba(29, 78, 216, 0.98), rgba(67, 56, 202, 0.98));
+    backdrop-filter: blur(20px);
+    flex-direction: column;
+    align-items: stretch;
+    padding: 16px;
+    gap: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, padding 0.3s ease;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    z-index: 10000;
+  }
+  
+  body.public-page .navbar-links.mobile-menu-open {
+    max-height: 500px;
+    padding: 16px;
+  }
+  
+  body.public-page .navbar-links a.nav-link {
+    display: block !important;
+    color: white;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 4px;
+    transition: all 0.2s ease;
+  }
+  
+  body.public-page .navbar-links a.nav-link:hover,
+  body.public-page .navbar-links a.nav-link:active {
+    background: rgba(255, 255, 255, 0.15);
+  }
+  
   body.public-page .navbar-links .nav-badge {
-    font-size: 0.85rem;
-    padding: 8px 16px;
-    white-space: nowrap;
+    width: 100%;
+    text-align: center;
+    margin-top: 8px;
+    padding: 12px 16px;
   }
   
   /* Simplify public navbar layout */
   body.public-page .navbar {
     padding: 12px 16px;
-    height: auto;
-    min-height: 58px;
+    height: 58px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+/* Desktop - hide hamburger, show normal menu */
+@media (min-width: 769px) {
+  .mobile-menu-toggle {
+    display: none !important;
   }
   
   body.public-page .navbar-links {
-    gap: 8px;
-  }
-  
-  /* Login link styling on mobile */
-  body.public-page .navbar-links a[href="/login"] {
-    color: white;
-    font-size: 0.9rem;
-    padding: 6px 12px;
+    position: static;
+    flex-direction: row;
+    max-height: none;
+    padding: 0;
+    background: transparent;
   }
 }
