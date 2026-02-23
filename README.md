@@ -1,5 +1,5 @@
 # LearnLoop 📚
-### A Modern Study Group Finder for BCA Students — Invertis University
+### A Modern Study Group Finder for Students
 
 A beautifully designed web application that helps students connect with study partners, create study groups, share notes, and collaborate effectively.
 
@@ -200,7 +200,7 @@ For issues or questions:
 
 ## 🎓 About LearnLoop
 
-LearnLoop was created to solve a real problem faced by BCA students at Invertis University - finding the right study partners and collaborating effectively. The platform makes it easy to:
+LearnLoop was created to solve a real problem faced by students - finding the right study partners and collaborating effectively. The platform makes it easy to:
 
 - Connect with classmates in your semester
 - Form focused study groups by subject

@@ -1,7 +1,7 @@
 {
   "name": "LearnLoop - Study Group Finder",
   "short_name": "LearnLoop",
-  "description": "Connect with study partners, share notes, and collaborate. Built for BCA students at Invertis University.",
+  "description": "Connect with study partners, share notes, and collaborate.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#1D4ED8",
