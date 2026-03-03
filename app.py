@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, session, flash, url_for, jsonify
+from flask import Flask, render_template, request, redirect, session, flash, url_for, jsonify, send_from_directory
 try:
     from flask_mysqldb import MySQL
 except ImportError:
@@ -1007,6 +1007,18 @@ def upload_note(group_id):
     else:
         flash('Invalid file type!', 'danger')
     return redirect(f'/group/{group_id}')
+
+# ─── DOWNLOAD FILE ────────────────────────────────────────────────
+@app.route('/download/<path:filename>')
+@login_required
+def download_file(filename):
+    """Download a file from uploads folder"""
+    from flask import send_from_directory
+    try:
+        return send_from_directory(app.config['UPLOAD_FOLDER'], filename, as_attachment=True)
+    except FileNotFoundError:
+        flash('File not found!', 'danger')
+        return redirect('/dashboard')
 
 # ─── SEND MESSAGE ─────────────────────────────────────────────────
 @app.route('/send-message/<int:group_id>', methods=['POST'])
