@@ -26,33 +26,34 @@ else:
 # Security headers
 @app.after_request
 def set_security_headers(response):
-    # Prevent clickjacking
-    response.headers['X-Frame-Options'] = 'SAMEORIGIN'
-    # Prevent MIME type sniffing
-    response.headers['X-Content-Type-Options'] = 'nosniff'
-    # Enable XSS protection
-    response.headers['X-XSS-Protection'] = '1; mode=block'
-    # Content Security Policy
-    response.headers['Content-Security-Policy'] = "default-src 'self' 'unsafe-inline' 'unsafe-eval' https://fonts.googleapis.com https://fonts.gstatic.com https://cdn.socket.io; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.socket.io;"
-    # Referrer Policy
-    response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
-    # HTTPS enforcement in production
-    if os.environ.get('PRODUCTION'):
-        response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
-    
-    # Cache static assets for better performance
-    if request.path.startswith('/static/'):
-        # Cache CSS, JS, images for 7 days
-        if any(request.path.endswith(ext) for ext in ['.css', '.js', '.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico', '.woff', '.woff2']):
-            response.headers['Cache-Control'] = 'public, max-age=604800'  # 7 days
-    else:
-        # Don't cache dynamic pages
-        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-        response.headers['Pragma'] = 'no-cache'
-        response.headers['Expires'] = '0'
-    
-    # TODO: Re-enable gzip compression after testing
-    # Temporarily disabled for local development
+    try:
+        # Prevent clickjacking
+        response.headers['X-Frame-Options'] = 'SAMEORIGIN'
+        # Prevent MIME type sniffing
+        response.headers['X-Content-Type-Options'] = 'nosniff'
+        # Enable XSS protection
+        response.headers['X-XSS-Protection'] = '1; mode=block'
+        # Content Security Policy
+        response.headers['Content-Security-Policy'] = "default-src 'self' 'unsafe-inline' 'unsafe-eval' https://fonts.googleapis.com https://fonts.gstatic.com https://cdn.socket.io; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.socket.io;"
+        # Referrer Policy
+        response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+        # HTTPS enforcement in production
+        if os.environ.get('PRODUCTION'):
+            response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
+        
+        # Cache static assets for better performance
+        if request.path.startswith('/static/'):
+            # Cache CSS, JS, images for 7 days
+            if any(request.path.endswith(ext) for ext in ['.css', '.js', '.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico', '.woff', '.woff2']):
+                response.headers['Cache-Control'] = 'public, max-age=604800'  # 7 days
+        else:
+            # Don't cache dynamic pages
+            response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+            response.headers['Pragma'] = 'no-cache'
+            response.headers['Expires'] = '0'
+    except Exception as e:
+        # Log error but don't break the response
+        print(f"Error in after_request: {e}")
     
     return response
 
