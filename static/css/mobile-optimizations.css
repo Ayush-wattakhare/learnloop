@@ -246,7 +246,7 @@ img {
     border-radius: 16px 16px 0 0 !important;
     max-height: 80vh;
     overflow-y: auto;
-    z-index: 99999 !important;
+    z-index: 100000 !important;
   }
 
   .profile-btn {
