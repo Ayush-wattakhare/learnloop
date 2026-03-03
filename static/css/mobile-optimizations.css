@@ -233,7 +233,7 @@ img {
 /* ── Mobile Profile Dropdown ── */
 @media (max-width: 768px) {
   .profile-dropdown {
-    position: static;
+    position: relative;
   }
 
   .profile-menu {
@@ -246,6 +246,7 @@ img {
     border-radius: 16px 16px 0 0 !important;
     max-height: 80vh;
     overflow-y: auto;
+    z-index: 99999 !important;
   }
 
   .profile-btn {

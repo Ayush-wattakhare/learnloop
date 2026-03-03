@@ -164,7 +164,7 @@ body {
   visibility: hidden;
   transform: translateY(-10px);
   transition: all 0.2s;
-  z-index: 1000;
+  z-index: 99999;
 }
 
 .profile-menu.show {
