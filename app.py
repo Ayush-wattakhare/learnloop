@@ -51,21 +51,8 @@ def set_security_headers(response):
         response.headers['Pragma'] = 'no-cache'
         response.headers['Expires'] = '0'
     
-    # Compress responses for faster transfer
-    if response.status_code < 300 and \
-       response.content_length and response.content_length > 500 and \
-       'gzip' in request.headers.get('Accept-Encoding', '').lower() and \
-       'Content-Encoding' not in response.headers:
-        
-        # Compress HTML, CSS, JS, JSON
-        if any(response.content_type.startswith(ct) for ct in ['text/', 'application/json', 'application/javascript']):
-            gzip_buffer = BytesIO()
-            with gzip.GzipFile(mode='wb', fileobj=gzip_buffer, compresslevel=6) as gzip_file:
-                gzip_file.write(response.get_data())
-            
-            response.set_data(gzip_buffer.getvalue())
-            response.headers['Content-Encoding'] = 'gzip'
-            response.headers['Content-Length'] = len(response.get_data())
+    # TODO: Re-enable gzip compression after testing
+    # Temporarily disabled for local development
     
     return response
 
