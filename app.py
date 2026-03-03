@@ -1196,44 +1196,55 @@ def remove_profile_picture():
 @login_required
 def messages():
     """View all conversations"""
-    cur = mysql.connection.cursor()
+    if session.get('demo_mode'):
+        # Demo mode - show demo data
+        return render_template('messages.html', friends=[], pending_requests=[])
     
-    # Get all friends (accepted friendships)
-    cur.execute("""
-        SELECT DISTINCT u.id, u.name, u.profile_picture,
-               (SELECT COUNT(*) FROM direct_messages 
-                WHERE sender_id = u.id AND receiver_id = %s AND is_read = FALSE) as unread_count,
-               (SELECT message FROM direct_messages 
-                WHERE (sender_id = u.id AND receiver_id = %s) OR (sender_id = %s AND receiver_id = u.id)
-                ORDER BY sent_at DESC LIMIT 1) as last_message,
-               (SELECT sent_at FROM direct_messages 
-                WHERE (sender_id = u.id AND receiver_id = %s) OR (sender_id = %s AND receiver_id = u.id)
-                ORDER BY sent_at DESC LIMIT 1) as last_message_time
-        FROM users u
-        WHERE u.id IN (
-            SELECT friend_id FROM friendships WHERE user_id = %s AND status = 'accepted'
-            UNION
-            SELECT user_id FROM friendships WHERE friend_id = %s AND status = 'accepted'
-        )
-        ORDER BY last_message_time DESC
-    """, [session['user_id'], session['user_id'], session['user_id'], 
-          session['user_id'], session['user_id'], session['user_id'], session['user_id']])
-    
-    friends = cur.fetchall()
-    
-    # Get pending friend requests
-    cur.execute("""
-        SELECT u.id, u.name, u.profile_picture, f.created_at
-        FROM friendships f
-        JOIN users u ON f.user_id = u.id
-        WHERE f.friend_id = %s AND f.status = 'pending'
-        ORDER BY f.created_at DESC
-    """, [session['user_id']])
-    
-    pending_requests = cur.fetchall()
-    cur.close()
-    
-    return render_template('messages.html', friends=friends, pending_requests=pending_requests)
+    try:
+        cur = mysql.connection.cursor()
+        
+        # Get all friends (accepted friendships)
+        cur.execute("""
+            SELECT DISTINCT u.id, u.name, u.profile_picture,
+                   (SELECT COUNT(*) FROM direct_messages 
+                    WHERE sender_id = u.id AND receiver_id = %s AND is_read = FALSE) as unread_count,
+                   (SELECT message FROM direct_messages 
+                    WHERE (sender_id = u.id AND receiver_id = %s) OR (sender_id = %s AND receiver_id = u.id)
+                    ORDER BY sent_at DESC LIMIT 1) as last_message,
+                   (SELECT sent_at FROM direct_messages 
+                    WHERE (sender_id = u.id AND receiver_id = %s) OR (sender_id = %s AND receiver_id = u.id)
+                    ORDER BY sent_at DESC LIMIT 1) as last_message_time
+            FROM users u
+            WHERE u.id IN (
+                SELECT friend_id FROM friendships WHERE user_id = %s AND status = 'accepted'
+                UNION
+                SELECT user_id FROM friendships WHERE friend_id = %s AND status = 'accepted'
+            )
+            ORDER BY last_message_time DESC
+        """, [session['user_id'], session['user_id'], session['user_id'], 
+              session['user_id'], session['user_id'], session['user_id'], session['user_id']])
+        
+        friends = cur.fetchall()
+        
+        # Get pending friend requests
+        cur.execute("""
+            SELECT u.id, u.name, u.profile_picture, f.created_at
+            FROM friendships f
+            JOIN users u ON f.user_id = u.id
+            WHERE f.friend_id = %s AND f.status = 'pending'
+            ORDER BY f.created_at DESC
+        """, [session['user_id']])
+        
+        pending_requests = cur.fetchall()
+        cur.close()
+        
+        return render_template('messages.html', friends=friends, pending_requests=pending_requests)
+    except Exception as e:
+        import traceback
+        print(f"Error in messages route: {e}")
+        print(traceback.format_exc())
+        flash('Error loading messages. Please try again.', 'danger')
+        return redirect('/dashboard')
 
 @app.route('/chat/<int:friend_id>')
 @login_required
