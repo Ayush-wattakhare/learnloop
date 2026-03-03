@@ -420,6 +420,8 @@ def login():
             email    = request.form.get('email', '').strip().lower()
             password = request.form.get('password', '')
             
+            print(f"Login attempt for email: {email}")  # Debug log
+            
             if not email or not password:
                 flash('Email and password are required!', 'danger')
                 return render_template('login.html')
@@ -427,29 +429,40 @@ def login():
             cur = mysql.connection.cursor()
             cur.execute("SELECT * FROM users WHERE email=%s", [email])
             user = cur.fetchone()
+            
+            print(f"User found: {user is not None}")  # Debug log
+            
+            if user:
+                print(f"User data length: {len(user)}")  # Debug log
+                print(f"Checking password hash...")  # Debug log
+                password_valid = check_password_hash(user[3], password)
+                print(f"Password valid: {password_valid}")  # Debug log
+                
+                if password_valid:
+                    # Clear rate limit on successful login
+                    if 'login_attempts' in session:
+                        del session['login_attempts']
+                    
+                    # Set session data
+                    session.permanent = True
+                    session['user_id']   = user[0]
+                    session['user_name'] = user[1]
+                    session['semester']  = user[4]
+                    session['profile_picture'] = user[7] if len(user) > 7 else None  # profile_picture column
+                    session['last_activity'] = datetime.now().isoformat()
+                    
+                    cur.close()
+                    flash(f'Welcome back, {user[1]}!', 'success')
+                    return redirect('/dashboard')
+            
             cur.close()
-
-            if user and check_password_hash(user[3], password):
-                # Clear rate limit on successful login
-                if 'login_attempts' in session:
-                    del session['login_attempts']
-                
-                # Set session data
-                session.permanent = True
-                session['user_id']   = user[0]
-                session['user_name'] = user[1]
-                session['semester']  = user[4]
-                session['profile_picture'] = user[7] if len(user) > 7 else None  # profile_picture column
-                session['last_activity'] = datetime.now().isoformat()
-                
-                flash(f'Welcome back, {user[1]}!', 'success')
-                return redirect('/dashboard')
             flash('Invalid email or password!', 'danger')
         except Exception as e:
             import traceback
+            error_details = traceback.format_exc()
             print(f"Error in login route: {e}")
-            print(traceback.format_exc())
-            flash('An error occurred during login. Please try again.', 'danger')
+            print(f"Full traceback: {error_details}")
+            flash(f'An error occurred during login: {str(e)}', 'danger')
             return render_template('login.html')
     
     return render_template('login.html')
