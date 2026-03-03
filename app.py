@@ -350,49 +350,57 @@ def register():
         return render_template('register.html')
     
     if request.method == 'POST':
-        # Rate limiting
-        if not rate_limit_check('register_attempts', max_attempts=3, window_minutes=60):
-            flash('Too many registration attempts. Please try again later.', 'danger')
-            return render_template('register.html')
-        
-        # Get and sanitize inputs
-        name     = sanitize_input(request.form.get('name', ''), max_length=100)
-        email    = request.form.get('email', '').strip().lower()
-        password = request.form.get('password', '')
-        semester = request.form.get('semester', '')
-        college  = sanitize_input(request.form.get('college', ''), max_length=200)
-        bio      = sanitize_input(request.form.get('bio', ''), max_length=500)
-        
-        # Validate inputs
-        if not name or not email or not password:
-            flash('All required fields must be filled!', 'danger')
-            return render_template('register.html')
-        
-        if not validate_email(email):
-            flash('Invalid email format!', 'danger')
-            return render_template('register.html')
-        
-        is_valid, message = validate_password(password)
-        if not is_valid:
-            flash(message, 'danger')
-            return render_template('register.html')
-        
-        # Hash password
-        password_hash = generate_password_hash(password)
+        try:
+            # Rate limiting
+            if not rate_limit_check('register_attempts', max_attempts=3, window_minutes=60):
+                flash('Too many registration attempts. Please try again later.', 'danger')
+                return render_template('register.html')
+            
+            # Get and sanitize inputs
+            name     = sanitize_input(request.form.get('name', ''), max_length=100)
+            email    = request.form.get('email', '').strip().lower()
+            password = request.form.get('password', '')
+            semester = request.form.get('semester', '')
+            college  = sanitize_input(request.form.get('college', ''), max_length=200)
+            bio      = sanitize_input(request.form.get('bio', ''), max_length=500)
+            
+            # Validate inputs
+            if not name or not email or not password:
+                flash('All required fields must be filled!', 'danger')
+                return render_template('register.html')
+            
+            if not validate_email(email):
+                flash('Invalid email format!', 'danger')
+                return render_template('register.html')
+            
+            is_valid, message = validate_password(password)
+            if not is_valid:
+                flash(message, 'danger')
+                return render_template('register.html')
+            
+            # Hash password
+            password_hash = generate_password_hash(password)
 
-        cur = mysql.connection.cursor()
-        cur.execute("SELECT id FROM users WHERE email=%s", [email])
-        if cur.fetchone():
-            flash('Email already registered!', 'danger')
-            return render_template('register.html')
+            cur = mysql.connection.cursor()
+            cur.execute("SELECT id FROM users WHERE email=%s", [email])
+            if cur.fetchone():
+                flash('Email already registered!', 'danger')
+                return render_template('register.html')
 
-        cur.execute("""INSERT INTO users (name, email, password, semester, college, bio)
-                       VALUES (%s,%s,%s,%s,%s,%s)""",
-                    (name, email, password_hash, semester, college, bio))
-        mysql.connection.commit()
-        cur.close()
-        flash('Account created! Please login.', 'success')
-        return redirect('/login')
+            cur.execute("""INSERT INTO users (name, email, password, semester, college, bio)
+                           VALUES (%s,%s,%s,%s,%s,%s)""",
+                        (name, email, password_hash, semester, college, bio))
+            mysql.connection.commit()
+            cur.close()
+            flash('Account created! Please login.', 'success')
+            return redirect('/login')
+        except Exception as e:
+            import traceback
+            print(f"Error in register route: {e}")
+            print(traceback.format_exc())
+            flash('An error occurred during registration. Please try again.', 'danger')
+            return render_template('register.html')
+    
     return render_template('register.html')
 
 # ─── LOGIN ────────────────────────────────────────────────────────
@@ -403,39 +411,47 @@ def login():
         return render_template('login.html')
     
     if request.method == 'POST':
-        # Rate limiting for login attempts
-        if not rate_limit_check('login_attempts', max_attempts=5, window_minutes=15):
-            flash('Too many login attempts. Please try again in 15 minutes.', 'danger')
-            return render_template('login.html')
-        
-        email    = request.form.get('email', '').strip().lower()
-        password = request.form.get('password', '')
-        
-        if not email or not password:
-            flash('Email and password are required!', 'danger')
-            return render_template('login.html')
-
-        cur = mysql.connection.cursor()
-        cur.execute("SELECT * FROM users WHERE email=%s", [email])
-        user = cur.fetchone()
-        cur.close()
-
-        if user and check_password_hash(user[3], password):
-            # Clear rate limit on successful login
-            if 'login_attempts' in session:
-                del session['login_attempts']
+        try:
+            # Rate limiting for login attempts
+            if not rate_limit_check('login_attempts', max_attempts=5, window_minutes=15):
+                flash('Too many login attempts. Please try again in 15 minutes.', 'danger')
+                return render_template('login.html')
             
-            # Set session data
-            session.permanent = True
-            session['user_id']   = user[0]
-            session['user_name'] = user[1]
-            session['semester']  = user[4]
-            session['profile_picture'] = user[7] if len(user) > 7 else None  # profile_picture column
-            session['last_activity'] = datetime.now().isoformat()
+            email    = request.form.get('email', '').strip().lower()
+            password = request.form.get('password', '')
             
-            flash(f'Welcome back, {user[1]}!', 'success')
-            return redirect('/dashboard')
-        flash('Invalid email or password!', 'danger')
+            if not email or not password:
+                flash('Email and password are required!', 'danger')
+                return render_template('login.html')
+
+            cur = mysql.connection.cursor()
+            cur.execute("SELECT * FROM users WHERE email=%s", [email])
+            user = cur.fetchone()
+            cur.close()
+
+            if user and check_password_hash(user[3], password):
+                # Clear rate limit on successful login
+                if 'login_attempts' in session:
+                    del session['login_attempts']
+                
+                # Set session data
+                session.permanent = True
+                session['user_id']   = user[0]
+                session['user_name'] = user[1]
+                session['semester']  = user[4]
+                session['profile_picture'] = user[7] if len(user) > 7 else None  # profile_picture column
+                session['last_activity'] = datetime.now().isoformat()
+                
+                flash(f'Welcome back, {user[1]}!', 'success')
+                return redirect('/dashboard')
+            flash('Invalid email or password!', 'danger')
+        except Exception as e:
+            import traceback
+            print(f"Error in login route: {e}")
+            print(traceback.format_exc())
+            flash('An error occurred during login. Please try again.', 'danger')
+            return render_template('login.html')
+    
     return render_template('login.html')
 
 # ─── LOGOUT ───────────────────────────────────────────────────────
