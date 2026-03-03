@@ -1466,11 +1466,18 @@ def notifications():
 @login_required
 def notifications_count():
     """Get unread notification count"""
-    cur = mysql.connection.cursor()
-    cur.execute("SELECT COUNT(*) FROM notifications WHERE user_id = %s AND is_read = FALSE", [session['user_id']])
-    count = cur.fetchone()[0]
-    cur.close()
-    return jsonify({'count': count})
+    try:
+        if session.get('demo_mode'):
+            return jsonify({'count': 0})
+        
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT COUNT(*) FROM notifications WHERE user_id = %s AND is_read = FALSE", [session['user_id']])
+        count = cur.fetchone()[0]
+        cur.close()
+        return jsonify({'count': count})
+    except Exception as e:
+        print(f"Error getting notification count: {e}")
+        return jsonify({'count': 0, 'error': str(e)})
 
 @app.route('/mark-notification-read/<int:notification_id>', methods=['POST'])
 @login_required
