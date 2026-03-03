@@ -14,7 +14,7 @@ from functools import wraps
 import gzip
 from io import BytesIO
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static', static_url_path='/static')
 
 # ─── Security Configuration ───────────────────────────────────────
 # Generate secure secret key if not provided
@@ -286,6 +286,16 @@ DEMO_DATA = {
 @app.route('/')
 def index():
     return render_template('index.html', db_available=DB_AVAILABLE)
+
+# ─── HEALTH CHECK ─────────────────────────────────────────────────
+@app.route('/health')
+def health_check():
+    return jsonify({
+        'status': 'ok',
+        'db_available': DB_AVAILABLE,
+        'static_folder': app.static_folder,
+        'static_url_path': app.static_url_path
+    })
 
 # ─── ABOUT ────────────────────────────────────────────────────────
 @app.route('/about')
